@@ -9,4 +9,5 @@
 
     Liy.prototype = Object.create(Liy.prototype);
     Liy.prototype.constructor = Liy;
+    
 })();
