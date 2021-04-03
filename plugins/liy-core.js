@@ -1,7 +1,12 @@
 /*:
  * @target MZ
- * @plugindesc The core of LiyEngine.
+ * @plugindesc A core of LiyEngine
  * @author Moiyri
- * 
- * @help Install and make it into use.
  */
+
+(() =>{
+    function Liy(){}
+
+    Liy.prototype = Object.create(Liy.prototype);
+    Liy.prototype.constructor = Liy;
+})();
