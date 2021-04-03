@@ -5,22 +5,30 @@
  */
 
 (() =>{
-    function Liy_ULDS(map){
-        this._map = map;
+    function Liy_ULDS(){
     }
 
-    Liy_ULDS.prototype = Object.create(Liy.prototype);
+    Liy_ULDS.prototype = Object.create(Tilemap.rototype);
     Liy_ULDS.prototype.constructor = Liy_ULDS;
 
-    Liy_ULDS.protorype.makeLayerList = function() {
+    Liy_ULDS.protorype.obtainLayerList = function() {
         var note = JSON.parse(this._map.note);
-        this._layers = note["layers"];
+        this._upperlayers = note["upperlayers"].split(",");
+        this._lowerlayers = note["lowerlayers"].split(",");
+    };
+    
+    Spriteset_Map.prototype.createTilemap = function() {
+        const tilemap = new Liy_ULDS();
+        tilemap.tileWidth = $gameMap.tileWidth();
+        tilemap.tileHeight = $gameMap.tileHeight();
+        tilemap.setData($gameMap.width(), $gameMap.height(), $gameMap.data());
+        tilemap.horizontalWrap = $gameMap.isLoopHorizontal();          tilemap.verticalWrap = $gameMap.isLoopVertical();
+        this._baseSprite.addChild(tilemap);
+        this._effectsContainer = tilemap;
+        this._tilemap = tilemap;
+        this.loadTileset();
     };
 
-    var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
-    Spriteset_Map.prototype.createTilemap = function() {
-        _Spriteset_Map_prototype_createTilemap.call(this);
-        this._liy = new Liy_ULDS($datamap);
-        this._liy.makeLayerList();
-    };
+    
+    
 })();
