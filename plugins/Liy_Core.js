@@ -16,6 +16,8 @@
     Liy.prototype = Object.create(Liy.prototype);
     Liy.prototype.constructor = Liy;
 
+    
+
     const pluginName = "Liy_Core";
 
     PluginManager.registerCommand = function(pluginName, "set", arg => {
