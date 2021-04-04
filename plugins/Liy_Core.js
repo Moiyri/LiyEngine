@@ -3,9 +3,9 @@
  * @plugindesc A core of LiyEngine
  * @author Moiyri
  *
- * @arg showDevtools
+ * @param showDevtools
  * @type bool
- * @default false
+ * @default 
  * @text Show Devtools
  * @desc Show Devtools automaticlly?
  */
@@ -16,17 +16,18 @@
     Liy.prototype = Object.create(Liy.prototype);
     Liy.prototype.constructor = Liy;
 
-    
-
     const pluginName = "Liy_Core";
 
-    PluginManager.registerCommand = function(pluginName, "set", arg => {
-        isShowDevtools = Boolean(arg.showDevtools);
-    });
+    Liy.streamOutFile = function(path, file){
+
+    }
+
+    var params = PluginManager.parameters("Liy_Core");
+    var isShowDevtools = Boolean(params["showDevtools"]) || false;
     
-    var _Main_prototype_run = Main.prototype.run;
-    Main.prototype.run = function(){
-        _Main_prototype_run.call(this);
-        if(isShowDevtools) SceneManager.showDevtools(); 
-    };   
+    Main.prototype.onEffekseerLoad = function(){
+        this.eraseLoadingSpinner();
+        if(isShowDevtools) SceneManager.showDevTools();
+        SceneManager.run(Scene_Boot);
+    }
 })();
