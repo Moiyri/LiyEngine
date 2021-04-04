@@ -1,21 +1,33 @@
 /*:
  * @target MZ
- * @plugindesc An unlimited layer display system belongs to LiyEngnie.
+ * @plugindesc An unlimited layer display system belongs to LiyEngine.
  * @author Moiyri
  */
 
 (() =>{
     function Liy_ULDS(var map){
         this._map = map;
+        this._layerList[] ={};
     }
 
     Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
     Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
     
-    // [{layers:[name:name1,x:x,y:y,location:upper/lowwer]}]
+    // [{layer:[name:name1,x:x,y:y,location:upper/lowwer]}]
     Liy_ULDS.prototype.obtainLayersInfo = function() {
-        this._linfo = JSON.parse(this._map.note);
+        let info = JSON.parse(this._map.note);
+        for(var i = 0; i <= info.layer.length; i++){
+            let layer = new Liy_ULDS.Layer();
+            layer.name(inf.layer[i].name);
+            layer.x(info.layer[i].x);
+            layer.y(info.layer[i].y);
+            this._layerList.push(layer);
+        }
     }
+
+    Liy_ULDS.prototype.ULDSLayerList = function(){
+        return this._layerList;
+    };
 
     function Liy_ULDS.Layer(){
         this._name = "0";
