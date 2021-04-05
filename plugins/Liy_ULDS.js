@@ -14,7 +14,7 @@
     Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
     Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
     
-    // [{layer:[name:name1,x:x,y:y,location:upper/lowwer]}]
+    // [{layer:{name:name1,x:x,y:y,location:upper/lowwer}}]
     Liy_ULDS.prototype.obtainLayersInfo = function() {
         let info = JSON.parse(this._map.note);
         for(var i = 0; i <= info.length - 1; i++){
@@ -70,22 +70,25 @@
         },
         configurable: true
     });
-
-    var _Spriteset_Map_prototype_initialize = Spriteset_Map.prototype.initialize;
-    Spriteset_Map.prototype.initialize = function() {
-        _Spriteset_Map_prototype_initialize.call(this);
-    };
+    
+    Object.defineProperty(Liy_ULDS.prototype, "sprite", {
+        get:function(){
+            return this._sprite;
+        },
+        set:function(){
+            this._sprite = sprite;
+        },
+        configurable: true
+    });
 
     var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
     Spriteset_Map.prototype.createTilemap = function() {
         _Spriteset_Map_prototype_createTilemap.call(this);
         this._ULDSLayer = (new Liy_ULDS($dataMap)).ULDSLayerList();
-        this._ulayersSprite = [];
         for(var i = 0; i < this._ULDSLayer.length; i++){
-            let sprite = new Sprite(ImageManager.loadPicture(this._ULDSLayer[i].name));
-            sprite.x = this._ULDSLayer[i].x;
-            sprite.y = this._ULDSLayer[i].y;
-            this._ulayersSprite.push(sprite);
+            this._ULDSLayer[i].sprite = new Sprite(ImageManager.loadPicture(this._ULDSLayer[i].name));
+            this._ULDSLayer[i].sprite.x = this._ULDSLayer[i].x;
+            this._ULDSLayer[i].sprite.y = this._ULDSLayer[i].y;
             this._baseSprite.addChild(sprite);
         }
     };
@@ -94,8 +97,8 @@
     Spriteset_Map.prototype.updateTilemap = function() {
         _Spriteset_Map_prototype_updateTilemap.call(this);
         for(var i = 0; i < this._ULDSLayer.length; i++){
-            this._ulayersSprite[i].x = this._ULDSLayer[i].x - $gameMap.displayX() *  $gameMap.tileWidth(); 
-            this._ulayersSprite[i].y = this._ULDSLayer[i].y - $gameMap.displayY() * $gameMap.tileHeight();
+            this._ULDSLayer[i].sprite.x = this._ULDSLayer[i].x - $gameMap.displayX() *  $gameMap.tileWidth(); 
+            this._ULDSLayer[i].sprite.y = this._ULDSLayer[i].y - $gameMap.displayY() * $gameMap.tileHeight();
         }
     };
 })();

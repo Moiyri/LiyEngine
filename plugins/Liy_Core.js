@@ -7,7 +7,7 @@
  * @type bool
  * @default 
  * @text Show Devtools
- * @desc Show Devtools automaticlly?
+ * @desc Show Devtools automatically?
  */
 
 (() =>{
