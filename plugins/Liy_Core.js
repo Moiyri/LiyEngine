@@ -22,9 +22,22 @@
     var isShowDevtools = Boolean(params["showDevtools"]) | false;
 
     $dataULDSMap = null;
+    $dataLiyScenes = null;
+
+    $globalVariable = new Map();
 
     Liy.tackleDataMap = function(){
         var note = $dataMap.note;
+    };
+
+    Liy.loadGlobalVar = function(){};
+
+    Liy.saveGlobalVar = function(){};
+
+    var _Scene_Map_prototype_create = Scene_Map.prototype.create;
+    Scene_Map.prototype.create = function(){
+        _Scene_Map_prototype_create.call(this);
+        Liy.tackleDataMap();
     };
 
     Main.prototype.onEffekseerLoad = function(){
