@@ -55,17 +55,22 @@
     var $dataULDSMap = null;
     var $dataLiyScenes = null;
 
+    Liy.resolveAllDataMap = function(){
+        var note = $dataMap.note;
+    };
+
+    function Liy.GlobalVariable(){}
+    
+    Liy.GlobalVariable.prototype = Object.create(Liy.GlobalVariable.prototype);
+    Liy.GlobalVariable.constructor = Liy.GlobalVariable;
+
+    var $globalVariable = new Map();
+
     const globalVarOperation = {
         "add" : Liy.GlobalVariable.add,
         "remove" : Liy.GlobalVariable.remove,
         "multiply" : Liy.GlobalVariable.multiply,
         "divide" : Liy.GlobalVariable.divide
-    };
-
-    var $globalVariable = new Map();
-
-    Liy.resolveAllDataMap = function(){
-        var note = $dataMap.note;
     };
 
     Liy.GlobalVariable.loadGlobalVarFromFile = function(){
@@ -79,11 +84,6 @@
     Liy.GlobalVariable.operateGlobalVariable = function(operation) {
         
     };
-
-    function Liy.GlobalVariable(){}
-    
-    Liy.GlobalVariable.prototype = Object.create(Liy.GlobalVariable.prototype);
-    Liy.GlobalVariable.constructor = Liy.GlobalVariable;
 
     var _Scene_Map_prototype_create = Scene_Map.prototype.create;
     Scene_Map.prototype.create = function(){
