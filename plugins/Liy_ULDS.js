@@ -78,7 +78,8 @@
         set:function(){
             this._sprite = sprite;
         },
-        configurable: true
+        configurable: true,
+        writable: true
     });
 
     var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;

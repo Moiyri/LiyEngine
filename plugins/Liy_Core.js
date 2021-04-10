@@ -13,23 +13,11 @@
  * @text Operate Global Variable.
  * @desc Operate Global Variable.
  *
- * @arg OperateSinal
+ * @arg Expression
  * @type string
- * @default let
- * @text Operation Sinal
- * @desc The operation Sinal that to do something.
- *
- * @arg Signal
- * @type string
- * @default var
- * @text Variable Sinal.
- * @desc Variable sinal.
- *
- * @Operation Arg
- * @type string
- * @default 0
- * @text Arguments
- * @desc The argumengs.
+ * @default null
+ * @text Expression
+ * @desc The operation expression.
  */
 
 (() =>{
@@ -44,11 +32,11 @@
     var isShowDevtools = Boolean(params["showDevtools"]) | false;
     
     PluginManager.registerCommand(pluginName, "globalvar", args => {
-        let sinal = args.Sinal;
-        let operation = args.OperateSinal;
-        let gArgs = args.Arg;
+        let expession = args.Expression;
         if(operation == "let"){
-        
+            $globalVariable.set(_sinal, _arg);
+        } else {
+            globalVarOperation[_op].call(this, $globalVariable[_sinal], _args);
         }
     });
 
@@ -59,36 +47,33 @@
         var note = $dataMap.note;
     };
 
-    function Liy.GlobalVariable(){}
+    function GlobalVar(){}
     
-    Liy.GlobalVariable.prototype = Object.create(Liy.GlobalVariable.prototype);
-    Liy.GlobalVariable.constructor = Liy.GlobalVariable;
+    GlobalVar.prototype = Object.create(GlobalVar.prototype);
+    GlobalVar.constructor = GlobalVar;
 
     var $globalVariable = new Map();
 
     const globalVarOperation = {
-        "add" : Liy.GlobalVariable.add,
-        "remove" : Liy.GlobalVariable.remove,
-        "multiply" : Liy.GlobalVariable.multiply,
-        "divide" : Liy.GlobalVariable.divide
+        "add" : GlobalVariable.add,
+        "remove" : GlobalVariable.remove,
+        "multiply" : GlobalVariable.multiply,
+        "divide" : GlobalVariable.divide
     };
 
-    Liy.GlobalVariable.loadGlobalVarFromFile = function(){
-        $globalVariable = StorageManager.loadObject("GlobalVariable");
+    GlobalVar.VarFileStream = function(isload){
+        if(isload) $globalVariable = StorageManager.loadObject("GlobalVariable");
+        else StorageManager.saveObject("GlobalVariable", $globalVariable);
     };
 
-    Liy.GlobalVariable.saveGlobalVarToFile = function(){
-        StorageManager.saveObject("GlobalVariable", $globalVariable);
-    };
-
-    Liy.GlobalVariable.operateGlobalVariable = function(operation) {
+    GlobalVar.operatVar = function(op) {
         
     };
 
-    var _Scene_Map_prototype_create = Scene_Map.prototype.create;
-    Scene_Map.prototype.create = function(){
+    var _Scene_Map_prototype_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+    Scene_Map.prototype.onMapLoaded = function(){
         _Scene_Map_prototype_create.call(this);
-        Liy.resolveAllDataMap();
+        Liy.resolveAllDataMap().call(this);
     };
 
     Main.prototype.onEffekseerLoad = function(){
