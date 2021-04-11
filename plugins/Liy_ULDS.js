@@ -14,7 +14,14 @@
     Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
     Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
     
-    // [{layer:{name:name1,x:x,y:y,location:upper/lowwer}}]
+    /*
+    [
+        {
+            "layer":
+            {"x" : 0,"y" : 0,"name" : "name", location : "upper/lowwer" }
+        }
+    ]
+    */
     Liy_ULDS.prototype.obtainLayersInfo = function() {
         let info = JSON.parse(this._map.note);
         for(var i = 0; i <= info.length - 1; i++){
@@ -23,6 +30,7 @@
                 _layer.name = info[i].layer.name;
                 _layer.x = info[i].layer.x;
                 _layer.y = info[i].layer.y;
+                _layer.location = info[i].layer.location;
                 this._layerList.push(_layer);
             }
         }
@@ -33,54 +41,15 @@
     };
 
     Liy_ULDS.Layer = function() {
-        this._name = "0";
-        this._x = 0;
-        this._y = 0;
+        this.name = "0";
+        this.x = 0;
+        this.y = 0;
+        this.sprite = null;
     }
 
     Liy_ULDS.Layer.prototype = Object.create(Liy_ULDS.Layer.prototype);
     Liy_ULDS.Layer.prototype.constructor = Liy_ULDS.prototype;
     
-    Object.defineProperty(Liy_ULDS.prototype, "name", {
-        get:function(){
-          return this._name;
-        },
-        set:function(name){
-          this._name = name;
-        },
-        configurable: true
-    });
-
-    Object.defineProperty(Liy_ULDS.prototype, "x", {
-        get:function(){
-            return this._x;
-        },
-        set:function(x){
-            this._x = x;
-        },
-        configurable: true
-    });
-    
-    Object.defineProperty(Liy_ULDS.prototype, "y", {
-        get:function(){
-            return this._y;
-        },
-        set:function(){
-            this._y = y;
-        },
-        configurable: true
-    });
-    
-    Object.defineProperty(Liy_ULDS.prototype, "sprite", {
-        get:function(){
-            return this._sprite;
-        },
-        set:function(){
-            this._sprite = sprite;
-        },
-        configurable: true,
-        writable: true
-    });
 
     var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
     Spriteset_Map.prototype.createTilemap = function() {
@@ -90,7 +59,7 @@
             this._ULDSLayer[i].sprite = new Sprite(ImageManager.loadPicture(this._ULDSLayer[i].name));
             this._ULDSLayer[i].sprite.x = this._ULDSLayer[i].x;
             this._ULDSLayer[i].sprite.y = this._ULDSLayer[i].y;
-            this._baseSprite.addChild(sprite);
+            this._baseSprite.addChild(this._ULDSLayer[i].sprite);
         }
     };
 

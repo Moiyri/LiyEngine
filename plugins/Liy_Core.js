@@ -55,10 +55,10 @@
     var $globalVariable = new Map();
 
     const globalVarOperation = {
-        "add" : GlobalVariable.add,
-        "remove" : GlobalVariable.remove,
-        "multiply" : GlobalVariable.multiply,
-        "divide" : GlobalVariable.divide
+        "add" : GlobalVar.add,
+        "remove" : GlobalVar.remove,
+        "multiply" : GlobalVar.multiply,
+        "divide" : GlobalVar.divide
     };
 
     GlobalVar.VarFileStream = function(isload){
@@ -72,8 +72,8 @@
 
     var _Scene_Map_prototype_onMapLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function(){
-        _Scene_Map_prototype_create.call(this);
-        Liy.resolveAllDataMap().call(this);
+        _Scene_Map_prototype_onMapLoaded.call(this);
+        Liy.resolveAllDataMap.call(this);
     };
 
     Main.prototype.onEffekseerLoad = function(){
