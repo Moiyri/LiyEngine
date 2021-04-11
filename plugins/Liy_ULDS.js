@@ -5,40 +5,11 @@
  */
 
 (() =>{
-    function Liy_ULDS(map){
-        this._map = map;
-        this._layerList = [];
-        this.obtainLayersInfo();
+    function Liy_ULDS(){
     }
 
     Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
-    Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
-    
-    /*
-    [
-        {
-            "layer":
-            {"x" : 0,"y" : 0,"name" : "name", location : "upper/lowwer" }
-        }
-    ]
-    */
-    Liy_ULDS.prototype.obtainLayersInfo = function() {
-        let info = JSON.parse(this._map.note);
-        for(var i = 0; i <= info.length - 1; i++){
-            let _layer = new Liy_ULDS.Layer();
-            if(info[i].layer){
-                _layer.name = info[i].layer.name;
-                _layer.x = info[i].layer.x;
-                _layer.y = info[i].layer.y;
-                _layer.location = info[i].layer.location;
-                this._layerList.push(_layer);
-            }
-        }
-    }
-
-    Liy_ULDS.prototype.ULDSLayerList = function() {
-        return this._layerList;
-    };
+    Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;
 
     Liy_ULDS.Layer = function() {
         this.name = "0";

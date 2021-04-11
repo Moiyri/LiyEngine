@@ -21,31 +21,44 @@
  */
 
 (() =>{
-    function Liy(){}
-
-    Liy.prototype = Object.create(Liy.prototype);
-    Liy.prototype.constructor = Liy;
-
     const pluginName = "Liy_Core";
 
     var params = PluginManager.parameters("Liy_Core");
     var isShowDevtools = Boolean(params["showDevtools"]) | false;
     
+    //globalvar expression
     PluginManager.registerCommand(pluginName, "globalvar", args => {
         let expession = args.Expression;
-        if(operation == "let"){
-            $globalVariable.set(_sinal, _arg);
-        } else {
-            globalVarOperation[_op].call(this, $globalVariable[_sinal], _args);
-        }
+        GlobalVar.resolveExp(expession);
     });
+
+//-----------------------------------------------------------
+
+    function Liy(){}
+
+    Liy.prototype = Object.create(Liy.prototype);
+    Liy.prototype.constructor = Liy;
 
     var $dataULDSMap = null;
     var $dataLiyScenes = null;
 
+    /*
+        {
+            "ulds": {
+                "layer": [{"x": 0, "y": 0, "name": 0, "location": 0}]
+            }
+        }
+    */
     Liy.resolveAllDataMap = function(){
-        var note = $dataMap.note;
+        var info = JSON.parse($dataMap.note);
+        try{
+            $dataULDSMap = info.ulds;
+        } catch(e) {
+            throw e;
+        }
     };
+
+//-----------------------------------------------------------
 
     function GlobalVar(){}
     
@@ -61,6 +74,10 @@
         "divide" : GlobalVar.divide
     };
 
+    GlobalVar.resolveExp = function(exp){
+
+    };
+
     GlobalVar.VarFileStream = function(isload){
         if(isload) $globalVariable = StorageManager.loadObject("GlobalVariable");
         else StorageManager.saveObject("GlobalVariable", $globalVariable);
@@ -70,10 +87,12 @@
         
     };
 
+//-----------------------------------------------------------
+
     var _Scene_Map_prototype_onMapLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function(){
         _Scene_Map_prototype_onMapLoaded.call(this);
-        Liy.resolveAllDataMap.call(this);
+        Liy.resolveAllDataMap();
     };
 
     Main.prototype.onEffekseerLoad = function(){
