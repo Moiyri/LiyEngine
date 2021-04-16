@@ -9,28 +9,13 @@
     }
 
     Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
-    Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;
-
-    Liy_ULDS.Layer = function() {
-        this.name = "0";
-        this.x = 0;
-        this.y = 0;
-        this.sprite = null;
-    }
-
-    Liy_ULDS.Layer.prototype = Object.create(Liy_ULDS.Layer.prototype);
-    Liy_ULDS.Layer.prototype.constructor = Liy_ULDS.prototype;
-    
+    Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
 
     var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
     Spriteset_Map.prototype.createTilemap = function() {
         _Spriteset_Map_prototype_createTilemap.call(this);
-        this._ULDSLayer = (new Liy_ULDS($dataMap)).ULDSLayerList();
-        for(var i = 0; i < this._ULDSLayer.length; i++){
-            this._ULDSLayer[i].sprite = new Sprite(ImageManager.loadPicture(this._ULDSLayer[i].name));
-            this._ULDSLayer[i].sprite.x = this._ULDSLayer[i].x;
-            this._ULDSLayer[i].sprite.y = this._ULDSLayer[i].y;
-            this._baseSprite.addChild(this._ULDSLayer[i].sprite);
+        for(var i = 0; i < $dataULDSMap.layer.length; i++){
+            this._uldsSprite = new Sprite(ImageManager.loadPicture($dataULDSMap.layer[i].name));
         }
     };
 

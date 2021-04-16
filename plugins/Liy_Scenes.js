@@ -3,19 +3,19 @@
  * @plugindesc To expand the function of initial scene, belongs to LiyEngine.
  * @author: Moiyri
  * 
- * @param Wait Time
+ * @param Stay Time
  * @desc time of waiting.
  * @default 2
  * 
  * @param Fade In Time
- * @desc rate of fade in.
+ * @desc Rate of fade in.
  * @default 24
  * 
  * @param Fade Out Time
  * @desc Rate of fade out.
  * @default 24
  * 
- * @param Image
+ * @param Image1
  * @desc Image to show
  * @default 
  * @type file
@@ -42,10 +42,6 @@ Scene_Splash.prototype.initialize = function() {
 
 Scene_Splash.prototype.create = function() {
     Scene_Base.prototype.create.call(this);
-    this._image  = new Sprite(ImageManager.loadBitmap('img/system/', _Image));
-    this._image.x = 0
-    this._image.y = 0;
-    this.addChild(this._image);
 };
 
 Scene_Splash.prototype.start = function() {
@@ -55,7 +51,7 @@ Scene_Splash.prototype.start = function() {
 };
 
 Scene_Splash.prototype.update = function(){
-    if((this._frame >= 0) && (this._frame < (wait_time * 60))){
+    if((this._frame >= 0) && (this._frame <  (wait_time * 60))){
         this._frame ++;
     }else if(this._frame >= (wait_time * 60)){
         this._frame = -1;

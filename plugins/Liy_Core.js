@@ -59,27 +59,26 @@
     };
 
 //-----------------------------------------------------------
-
     function GlobalVar(){}
     
     GlobalVar.prototype = Object.create(GlobalVar.prototype);
     GlobalVar.constructor = GlobalVar;
 
-    var $globalVariable = new Map();
-
-    const globalVarOperation = {
-        "add" : GlobalVar.add,
-        "remove" : GlobalVar.remove,
-        "multiply" : GlobalVar.multiply,
-        "divide" : GlobalVar.divide
-    };
+    var $globalVar = new Map();
 
     GlobalVar.resolveExp = function(exp){
-
+        exp.replace("", " ");
+        for(i in new RegExp("/(=)|(+=)|(-=)|(*=)|(/=).?(/w)/").exec(exp){
+            exp.replace(i, $globalVar[i]);
+        }
     };
 
+    GlobalVar.execExp = function(exp){
+        
+    }
+
     GlobalVar.VarFileStream = function(isload){
-        if(isload) $globalVariable = StorageManager.loadObject("GlobalVariable");
+        if(isload) $globalVariable = StorageManager.loadObject("GlobalVariable")
         else StorageManager.saveObject("GlobalVariable", $globalVariable);
     };
 
@@ -88,7 +87,9 @@
     };
 
 //-----------------------------------------------------------
+    function Lib_LibBezier(){}
 
+//-----------------------------------------------------------
     var _Scene_Map_prototype_onMapLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function(){
         _Scene_Map_prototype_onMapLoaded.call(this);
