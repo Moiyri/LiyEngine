@@ -11,15 +11,16 @@
         if ($gameMessage.isBusy()) {
             return false;
         }
-        if($gameMessage.resolveAutoMessage(this.currentCommand().parameters[0])){
+        if($gameMessage.resolveMessages(this.currentCommand().parameters[0])){
             $gameMessage.setFull(true);
+            $gameMessage.setBackground(params[2])
             $gameMessage.add(this.currentCommand().parameters[0]);
         } else {
             $gameMessage.setScroll(params[0], params[1]);
-            while (this.nextEventCode() === 405) {
-                this._index++;
-                $gameMessage.add(this.currentCommand().parameters[0]);
-            }
+        }
+        while (this.nextEventCode() === 405) {
+            this._index++;
+            $gameMessage.add(this.currentCommand().parameters[0]);
         }
         this.setWaitMode("message");
         return true;
@@ -32,13 +33,35 @@
         this.move(rect.x, full ? 0 : rect.y, rect.width,
             full ? Graphics.boxHeight : rect.height);
     };
-)}();
 
-Game_Message.prototype.resolveAutoMessage = function(text) {
+    var _Game_Message_prototype_clear = Game_Message.prototype.clear;
+    Game_Message.prototype.clear = function() {
+        _Game_Message_prototype_clear.call(this);
+        this._stateX = 0;
+        this._displayPattern = "";
+    };
+
+    Window_Message.prototype.startMessage = function() {
+        const text = $gameMessage.allText();
+        const textState = this.createTextState(text, 0, 0, 0);
+        textState.x = this.newLineX(textState);
+        textState.startX = $gameMessage._stateX;
+        this._textState = textState;
+        this.newPage(this._textState);
+        this.updatePlacement();
+        this.updateBackground();
+        this.open();
+        this._nameBoxWindow.start();
+    };
+})();
+
+Game_Message.prototype.resolveMessages = function(text) {
     var reg = new RegExp(/\/am[*]/);
     if(reg.exec(text)){
         var msg = JSON.parse(new RegExp(/^[]$/).exec(reg.exec(text)[0]));
-        this._autoMsgX = msg.x;
+        this._stateX = msg.x;
+        this._background = msg.bkg;
+        this._displayPattern = msg.pattern;
         return true;
     }
     return false;
