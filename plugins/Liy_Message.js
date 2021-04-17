@@ -12,6 +12,7 @@
             return false;
         }
         if($gameMessage.resolveAutoMessage(this.currentCommand().parameters[0])){
+            $gameMessage.setFull(true);
             $gameMessage.add(this.currentCommand().parameters[0]);
         } else {
             $gameMessage.setScroll(params[0], params[1]);
@@ -24,28 +25,14 @@
         return true;
     };
 
-    /*var _Game_Message_prototype_clear = Game_Message.prototype.clear;
-    Game_Message.prototype.clear = function() {
-        _Game_Message_prototype_clear.call(this);
-        this._autoMsgX = 0;
-        this._autoMsgY = 0;
-        this._autoMsgHeight = Graphics.boxHeight;
-        this._autoMsgWidth = Graphics.boxWidth;
-    };*/
-
-    Window_Message.prototype.startMessage = function() {
-        const text = $gameMessage.allText();
-        const textState = this.createTextState(text, 0, 0, 0);
-        textState.x = this.newLineX(textState);
-        textState.startX = textState.x;
-        this._textState = textState;
-        this.newPage(this._textState);
-        this.updatePlacement();
-        this.updateBackground();
-        this.open();
-        this._nameBoxWindow.start();
+    var _Window_Message_prototype_initialize = Window_Message.prototype.initialize;
+    Window_Message.prototype.initialize = function(rect) {
+        _Window_Message_prototype_initialize.call(this);
+        let full = $gameMessage.fullMode();
+        this.move(rect.x, full ? 0 : rect.y, rect.width,
+            full ? Graphics.boxHeight : rect.height);
     };
-})();
+)}();
 
 Game_Message.prototype.resolveAutoMessage = function(text) {
     var reg = new RegExp(/\/am[*]/);
@@ -57,6 +44,10 @@ Game_Message.prototype.resolveAutoMessage = function(text) {
     return false;
 };
 
-Window_Message.prototype.autoAdaptRect = function(textstat) {
-    this.move(this.x, this.y, this.width, textstat.height);
+Game_Message.prototype.setFull = function(full) {
+    this._fullMode = full;
+};
+
+Game_Message.prototype.fullMode = function() {
+    return this._fullMode;
 };
