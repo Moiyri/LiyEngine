@@ -44,6 +44,7 @@
     Main.prototype.onEffekseerLoad = function(){
         this.eraseLoadingSpinner();
         if(isShowDevtools) SceneManager.showDevTools();
+        GlobalVar.loadVar();
         SceneManager.run(Scene_Boot);
     };
 })();
@@ -75,19 +76,24 @@ GlobalVar.constructor = GlobalVar;
 var $globalVar = new Map();
 
 GlobalVar.resolveExp = function(exp){
-exp.replace("", " ");
-    for(i in new RegExp("/(=)|(+=)|(-=)|(*=)|(/=).?(/w)/").exec(exp)){
-        exp.replace(i, $globalVar[i]);
+    let reg = new RegExp(\/w+*((=)|(-=)|(+=)|(/=))\);
+    eval(exp);
+    for(i in JSON.parse(reg.exec(exp)){
+        $globalVar.push(i, eval(i));
     }
 };
 
-GlobalVar.execExp = function(exp){
-}
-
 GlobalVar.VarFileStream = function(isload){
-    if(isload) $globalVariable = StorageManager.loadObject("GlobalVariable")
-    else StorageManager.saveObject("GlobalVariable", $globalVariable);
+    if(isload) {
+        $globalVariable = StorageManager.loadObject("GlobalVariable");
+    } else {
+        StorageManager.saveObject("GlobalVariable", $globalVariable);
+    }
 };
 
-GlobalVar.operatVar = function(op) {
+GlobalVar.loadVar = function() {
+    this.VarFileStream(true);
+    for(i in $globalVar){
+        eval("var " + i + " = " + $globalVar[i]);
+    }
 };

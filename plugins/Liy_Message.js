@@ -4,6 +4,8 @@
  * @author Moiyri
  * 
  * @help
+ *
+ * Use /ft[{"x" : 0, "pattern" : "normal"}] in ScrollText to display a full screen text.
  */
 
 (() => {
@@ -37,6 +39,7 @@
     var _Game_Message_prototype_clear = Game_Message.prototype.clear;
     Game_Message.prototype.clear = function() {
         _Game_Message_prototype_clear.call(this);
+        this._fullMode = 0;
         this._stateX = 0;
         this._displayPattern = "";
     };
@@ -56,7 +59,7 @@
 })();
 
 Game_Message.prototype.resolveMessages = function(text) {
-    var reg = new RegExp(/\/am[*]/);
+    var reg = new RegExp(/\/ft[*]/);
     if(reg.exec(text)){
         var msg = JSON.parse(new RegExp(/^[]$/).exec(reg.exec(text)[0]));
         this._stateX = msg.x;
