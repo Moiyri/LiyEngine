@@ -44,7 +44,11 @@
     Main.prototype.onEffekseerLoad = function(){
         this.eraseLoadingSpinner();
         if(isShowDevtools) SceneManager.showDevTools();
-        GlobalVar.loadVar();
+        /*try{
+            GlobalVar.loadVar();
+        } catch(e) {
+
+        }*/
         SceneManager.run(Scene_Boot);
     };
 })();
@@ -76,10 +80,10 @@ GlobalVar.constructor = GlobalVar;
 var $globalVar = new Map();
 
 GlobalVar.resolveExp = function(exp){
-    let reg = new RegExp(\/w+*((=)|(-=)|(+=)|(/=))\);
+    let reg = new RegExp(/\w.*((=)|(+=)|(-=)|(\/=))/g);
     eval(exp);
-    for(i in JSON.parse(reg.exec(exp)){
-        $globalVar.push(i, eval(i));
+    for(i in JSON.parse(reg.exec(exp))){
+        eval("$globalVar." + i + " = " + eval(i));
     }
 };
 
