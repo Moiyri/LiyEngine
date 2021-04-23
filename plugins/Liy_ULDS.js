@@ -26,6 +26,7 @@
     var _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
     Spriteset_Map.prototype.createTilemap = function() {
         _Spriteset_Map_prototype_createTilemap.call(this);
+        if(!$dataULDSMap) return;
         this._uldsSprite = [];
         for(var i = 0, sprite = null; i < $dataULDSMap.layer.length; i++){
             sprite = $dataULDSMap.layer[i].tiling | false ? new TilingSprite() : new Sprite();

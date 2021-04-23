@@ -60,12 +60,10 @@ var $dataULDSMap = null;
 var $dataLiyScenes = null;
 
 Liy.resolveAllDataMap = function() {
-    var info = JSON.parse($dataMap.note);
     try{
+        var info = JSON.parse($dataMap.note);
         $dataULDSMap = info.ulds;
-    } catch(e) {
-        throw e;
-    }
+    } catch(e) {}
 };
 
 //-----------------------------------------------------------

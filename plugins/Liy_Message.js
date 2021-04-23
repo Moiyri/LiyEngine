@@ -13,16 +13,13 @@
         if ($gameMessage.isBusy()) {
             return false;
         }
-        if($gameMessage.resolveMessages(this.currentCommand().parameters[0])){
-            $gameMessage.setFull(true);
-            $gameMessage.setBackground(params[2])
-            $gameMessage.add(this.currentCommand().parameters[0]);
-        } else {
-            $gameMessage.setScroll(params[0], params[1]);
-        }
         while (this.nextEventCode() === 405) {
             this._index++;
-            $gameMessage.add(this.currentCommand().parameters[0]);
+            if($gameMessage.resolveMessages(this.currentCommand().parameters[0])){
+                $gameMessage.setFull(true);
+            }
+            if(!$gameMessage.fullMode()) $gameMessage.setScroll(params[0], params[1]);
+            $gameMessage.add(this.currentCommand().parameters[0].replace(/\/ft\[.*\]/, ''));
         }
         this.setWaitMode("message");
         return true;
@@ -30,7 +27,7 @@
 
     var _Window_Message_prototype_initialize = Window_Message.prototype.initialize;
     Window_Message.prototype.initialize = function(rect) {
-        _Window_Message_prototype_initialize.call(this);
+        _Window_Message_prototype_initialize.call(this, rect);
         let full = $gameMessage.fullMode();
         this.move(rect.x, full ? 0 : rect.y, rect.width,
             full ? Graphics.boxHeight : rect.height);
@@ -59,12 +56,13 @@
 })();
 
 Game_Message.prototype.resolveMessages = function(text) {
-    var reg = new RegExp(/\/ft[*]/);
-    if(reg.exec(text)){
-        var msg = JSON.parse(new RegExp(/^[]$/).exec(reg.exec(text)[0]));
-        this._stateX = msg.x;
-        this._background = msg.bkg;
-        this._displayPattern = msg.pattern;
+    var reg = new RegExp(/\/ft\[.*\]/);
+    var msg = text.match(reg);
+    if(msg){
+        info = JSON.parse(msg[0].replace(/\/ft\[|\]/g, ''));
+        this._stateX = info.x;
+        this._background = info.bkg;
+        this._displayPattern = info.pattern;
         return true;
     }
     return false;
