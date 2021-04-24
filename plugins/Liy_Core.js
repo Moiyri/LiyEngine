@@ -59,6 +59,8 @@ function Liy() {}
 var $dataULDSMap = null;
 var $dataLiyScenes = null;
 
+var $testVar = [];
+
 Liy.resolveAllDataMap = function() {
     try{
         var info = JSON.parse($dataMap.note);
@@ -80,7 +82,7 @@ var $globalVar = new Map();
 GlobalVar.resolveExp = function(exp){
     let reg = new RegExp(/\w.*((=)|(+=)|(-=)|(\/=))/g);
     eval(exp);
-    for(i in JSON.parse(reg.exec(exp))){
+    for(i in exp.match(reg)){
         eval("$globalVar." + i + " = " + eval(i));
     }
 };

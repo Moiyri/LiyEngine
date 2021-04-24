@@ -5,7 +5,7 @@
  * 
  * @help
  *
- * Use /ft[{"x" : 0, "pattern" : "normal"}] in ScrollText to display a full screen text.
+ * Use /ft[{"x" : 0, "bkg" : 0}] in ScrollText to display a full screen text.
  */
 
 (() => {
@@ -38,7 +38,7 @@
         _Game_Message_prototype_clear.call(this);
         this._fullMode = 0;
         this._stateX = 0;
-        this._displayPattern = "";
+        this._stateY = 0;
     };
 
     Window_Message.prototype.startMessage = function() {
@@ -46,6 +46,7 @@
         const textState = this.createTextState(text, 0, 0, 0);
         textState.x = this.newLineX(textState);
         textState.startX = $gameMessage._stateX;
+        textState.startY = $gameMessage._stateY;
         this._textState = textState;
         this.newPage(this._textState);
         this.updatePlacement();
@@ -61,8 +62,8 @@ Game_Message.prototype.resolveMessages = function(text) {
     if(msg){
         info = JSON.parse(msg[0].replace(/\/ft\[|\]/g, ''));
         this._stateX = info.x;
+        this._stateY = info.y;
         this._background = info.bkg;
-        this._displayPattern = info.pattern;
         return true;
     }
     return false;
@@ -75,3 +76,6 @@ Game_Message.prototype.setFull = function(full) {
 Game_Message.prototype.fullMode = function() {
     return this._fullMode;
 };
+
+//-----------------------------------------------
+function Liy_Messages(){}
