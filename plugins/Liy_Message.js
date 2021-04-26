@@ -15,10 +15,10 @@
         }
         while (this.nextEventCode() === 405) {
             this._index++;
-            if($gameMessage.resolveMessages(this.currentCommand().parameters[0])){
+            if($gameMessage.hasFull(this.currentCommand().parameters[0]))
                 $gameMessage.setFull(true);
-            }
-            if(!$gameMessage.fullMode()) $gameMessage.setScroll(params[0], params[1]);
+            if(!$gameMessage.fullMode()) 
+                $gameMessage.setScroll(params[0], params[1]);
             $gameMessage.add(this.currentCommand().parameters[0].replace(/\/ft\[.*\]/, ''));
         }
         this.setWaitMode("message");
@@ -56,17 +56,8 @@
     };
 })();
 
-Game_Message.prototype.resolveMessages = function(text) {
-    var reg = new RegExp(/\/ft\[.*\]/);
-    var msg = text.match(reg);
-    if(msg){
-        info = JSON.parse(msg[0].replace(/\/ft\[|\]/g, ''));
-        this._stateX = info.x;
-        this._stateY = info.y;
-        this._background = info.bkg;
-        return true;
-    }
-    return false;
+Game_Message.prototype.hasFull = function(text) {
+    return text.match(/\/ft\[.*\]/);
 };
 
 Game_Message.prototype.setFull = function(full) {
@@ -79,3 +70,7 @@ Game_Message.prototype.fullMode = function() {
 
 //-----------------------------------------------
 function Liy_Messages(){}
+
+Liy_Messages.resolveNotes = function(note) {
+    
+};

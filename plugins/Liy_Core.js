@@ -69,35 +69,51 @@ Liy.resolveAllDataMap = function() {
 };
 
 //-----------------------------------------------------------
-function Liy_Tween(){}
+function Liy_Tween(x, y){
+    this._maxX = x;
+    this._maxY = y;
+    this._type = '';
+}
 
+Liy_Tween.prototype = Object.create(Liy_Tween.prototype);
+Liy_Tween.prototype.constructor = Liy_Tween;
+
+Liy_Tween.prototype.exec = function(pos) {
+    return eval("this." + this._type + ".call(this, pos / this._maxX) * this._maxY");
+};
+
+Liy_Tween.easeInQuad =  function(pos) {
+    return Math.pow(pos, 2);
+};
+
+Liy_Tween.easeOutQuad = function(pos) {
+    return -(Math.pow((pos-1), 2) -1);
+};
+
+Liy_Tween.easeInOutQuad = function(pos) {
+    if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,2);
+    return -0.5 * ((pos-=2)*pos - 2);
+};
+
+Liy_Tween.easeInCubic = function(pos) {
+    return Math.pow(pos, 3);
+};
+
+Liy_Tween.easeOutCubic = function(pos) {
+    return (Math.pow((pos-1), 3) +1);
+};
+
+Liy_Tween.easeInOutCubic =function(pos) {
+    if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,3);
+    return 0.5 * (Math.pow((pos-2),3) + 2);
+};
+
+Liy_Tween.reverse = function(pos) {
+    return 1 - pos;
+};
+
+/*
 tween: {
-            easeInQuad: function(pos){
-                return Math.pow(pos, 2);
-            },
-
-            easeOutQuad: function(pos){
-                return -(Math.pow((pos-1), 2) -1);
-            },
-
-            easeInOutQuad: function(pos){
-                if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,2);
-                return -0.5 * ((pos-=2)*pos - 2);
-            },
-
-            easeInCubic: function(pos){
-                return Math.pow(pos, 3);
-            },
-
-            easeOutCubic: function(pos){
-                return (Math.pow((pos-1), 3) +1);
-            },
-
-            easeInOutCubic: function(pos){
-                if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,3);
-                return 0.5 * (Math.pow((pos-2),3) + 2);
-            },
-
             easeInQuart: function(pos){
                 return Math.pow(pos, 4);
             },
@@ -134,46 +150,6 @@ tween: {
 
             easeInOutSine: function(pos){
                 return (-.5 * (Math.cos(Math.PI*pos) -1));
-            },
-
-            easeInExpo: function(pos){
-                return (pos==0) ? 0 : Math.pow(2, 10 * (pos - 1));
-            },
-
-            easeOutExpo: function(pos){
-                return (pos==1) ? 1 : -Math.pow(2, -10 * pos) + 1;
-            },
-
-            easeInOutExpo: function(pos){
-                if(pos==0) return 0;
-                if(pos==1) return 1;
-                if((pos/=0.5) < 1) return 0.5 * Math.pow(2,10 * (pos-1));
-                return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
-            },
-
-            easeInCirc: function(pos){
-                return -(Math.sqrt(1 - (pos*pos)) - 1);
-            },
-
-            easeOutCirc: function(pos){
-                return Math.sqrt(1 - Math.pow((pos-1), 2))
-            },
-
-            easeInOutCirc: function(pos){
-                if((pos/=0.5) < 1) return -0.5 * (Math.sqrt(1 - pos*pos) - 1);
-                return 0.5 * (Math.sqrt(1 - (pos-=2)*pos) + 1);
-            },
-
-            easeOutBounce: function(pos){
-                if ((pos) < (1/2.75)) {
-                    return (7.5625*pos*pos);
-                } else if (pos < (2/2.75)) {
-                    return (7.5625*(pos-=(1.5/2.75))*pos + .75);
-                } else if (pos < (2.5/2.75)) {
-                    return (7.5625*(pos-=(2.25/2.75))*pos + .9375);
-                } else {
-                    return (7.5625*(pos-=(2.625/2.75))*pos + .984375);
-                }
             },
 
             easeInBack: function(pos){
@@ -253,51 +229,48 @@ tween: {
                 return pos
             },
 
-            sinusoidal: function(pos) {
-                return (-Math.cos(pos*Math.PI)/2) + 0.5;
-            },
+        sinusoidal: function(pos) {
+            return (-Math.cos(pos*Math.PI)/2) + 0.5;
+        },
 
-            reverse: function(pos) {
-                return 1 - pos;
-            },
+        mirror: function(pos, transition) {
+            transition = transition || tween.sinusoidal;
+            if(pos<0.5)
+                return transition(pos*2);
+            else
+                return transition(1-(pos-0.5)*2);
+        },
 
-            mirror: function(pos, transition) {
-                transition = transition || tween.sinusoidal;
-                if(pos<0.5)
-                    return transition(pos*2);
-                else
-                    return transition(1-(pos-0.5)*2);
-            },
+        flicker: function(pos) {
+            var pos = pos + (Math.random()-0.5)/5;
+            return tween.sinusoidal(pos < 0 ? 0 : pos > 1 ? 1 : pos);
+        },
 
-            flicker: function(pos) {
-                var pos = pos + (Math.random()-0.5)/5;
-                return tween.sinusoidal(pos < 0 ? 0 : pos > 1 ? 1 : pos);
-            },
+        wobble: function(pos) {
+            return (-Math.cos(pos*Math.PI*(9*pos))/2) + 0.5;
+        },
 
-            wobble: function(pos) {
-                return (-Math.cos(pos*Math.PI*(9*pos))/2) + 0.5;
-            },
+        pulse: function(pos, pulses) {
+            return (-Math.cos((pos*((pulses||5)-.5)*2)*Math.PI)/2) + .5;
+        },
 
-            pulse: function(pos, pulses) {
-                return (-Math.cos((pos*((pulses||5)-.5)*2)*Math.PI)/2) + .5;
-            },
+        blink: function(pos, blinks) {
+            return Math.round(pos*(blinks||5)) % 2;
+        },
 
-            blink: function(pos, blinks) {
-                return Math.round(pos*(blinks||5)) % 2;
-            },
+        spring: function(pos) {
+            return 1 - (Math.cos(pos * 4.5 * Math.PI) * Math.exp(-pos * 6));
+        },
 
-            spring: function(pos) {
-                return 1 - (Math.cos(pos * 4.5 * Math.PI) * Math.exp(-pos * 6));
-            },
+        none: function(pos){
+            return 0
+        },
 
-            none: function(pos){
-                return 0
-            },
-
-            full: function(pos){
-                return 1
-            }
+        full: function(pos){
+            return 1
+        }
 }
+*/
 
 //-----------------------------------------------------------
 function GlobalVar() {}
