@@ -74,3 +74,42 @@ function Liy_Messages(){}
 Liy_Messages.resolveNotes = function(note) {
     
 };
+
+Liy_Messages.processCodes = function(code) {
+    try {
+    
+    } catch {}
+};
+
+//-----------------------------------------------
+function Window_SusMessage(){
+    this.initialize(...arguments);
+}
+
+Window_SusMessage.prototype = Object.create(Window_Message.prototype);
+Window_SusMessage.prototype.constructor = Window_SusMessage;
+    
+Window_SusMessage.prototype.initMembers = function() {
+    Window_Message.prototype.initMembers.call(this);
+    this._target = null;
+    this._animation = null;
+};
+
+Window_SusMessage.prototype.update = function() {
+    this.updateLocation();
+    Window_Message.prototype.update.call(this);
+};
+
+Window_SusMessage.prototype.startMessage = function() {
+    
+};
+
+Window_SusMessage.prototype.updateLocation = function() {
+    this.move(this._target.x - this._textState.width / 2, this._target.y + 10,
+        this._textState.width, this._textState.height);
+};
+
+Window_SusMessage.prototype._updatePauseSign = function() {
+    Window.prototype._updatePauseSign.call(this);
+    
+};
