@@ -60,11 +60,18 @@
         return $gameMessage.hasText() && !$gameMessage.scrollMode() && !$gameMessage.susMode();
     };
 
-    var _Scene_Message_prototype_createAllWindows = Scene_Message.prototype.createAllWindows;
-    Scene_Message.prototype.createAllWindows = function() {
-        _Scene_Message_prototype_createAllWindows.call(this);
-        this.createSusWindow();
+    Scene_Map.prototype.newSusWindow = function() {
+        const rect = new Rectangle(1, 1, 1, 1);
+        const susWindow = new Window_SusMessage(rect;
+        this._susWindow.concat(susWindow);
+        this.addWindow(susWindow);
     };
+
+    var _Scene_Map_prototype_initialize = Scene_Map.prototype.initialize;
+    Scene_Map.prototype.initialize = function() {
+        _Scene_Map_prototype_initialize.call(this);
+        this.updatSusWindow();
+    }
 
     Window.prototype.move = function(x, y, width, height, tween = null) {
         if(tween){
@@ -125,19 +132,23 @@ Game_Message.prototype.susMode = function() {
 };
 
 Game_Message.prototype.setSus = function(set) {
-    this.susMode = set;
+    this._susMode = set;
 };
 
-Scene_Message.prototype.createSusWindow = function() {
-    const rect = this.susWindowRect();
-    this._susWindow = new Window_SusMessage(rect);
-    this.addWindow(_susWindow);
+Scene_Map.prototype.updateSusWindow = function() {
+
 };
 
-Scene_Message.prototype.susWindowRect = function() {
-    return new Rectangle(1, 1, 1, 1);
-};
+Game_Message.prototype.setSusText = function(target, text) {
+    this._susText.concat({
+        target : target,
+        text : text});
+};  
 
+Game_Message.prototype.hadSusText = function() {
+    return !!this._susText;
+};
+        
 //-----------------------------------------------
 function Liy_Messages(){}
 
@@ -147,7 +158,7 @@ Liy_Messages.resolveNotes = function(note) {
 
 Liy_Messages.processCodes = function(code) {
     try {
-    
+        Window_Message.prototype.processEscapeCharacter.call(this, code); 
     } catch {}
 };
 
@@ -161,13 +172,17 @@ Window_SusMessage.prototype.constructor = Window_SusMessage;
     
 Window_SusMessage.prototype.initMembers = function(rect) {
     Window_Message.prototype.initMembers.call(this, rect);
-    this._target = [];
+    this._target = null;
     this._animation = null;
+};
+
+Window_SusMessage.prototype.startMessage = function() {
+    this.updateLocation();
+    Window_Message.prototype.startMessage.call(this);
 };
 
 Window_SusMessage.prototype.update = function() {
     this.updateLocation();
-    this.updateAllPages();
     Window_Message.prototype.update.call(this);
 };
 
@@ -175,10 +190,6 @@ Window_SusMessage.prototype.updateLocation = function() {
     this.move(this._target.x - this._textState.width / 2, this._target.y + 10,
         this._textState.width, this._textState.height);
 }
-
-Window_SusMessage.prototype.updateAllPages = function() {
-
-};
 
 Window_SusMessage.prototype._updatePauseSign = function() {
     const sprite = this._pauseSignSprite;
@@ -194,4 +205,8 @@ Window_SusMessage.prototype._updatePauseSign = function() {
     }
     sprite.setFrame(sx + x * p, sy + y * p, p, p);
     sprite.visible = this.isOpen();
+};
+
+Window_SusMessage.prototype.canStart = function() {
+    return $gameMessage.hasSusText();
 };
