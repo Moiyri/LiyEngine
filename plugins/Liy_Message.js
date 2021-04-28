@@ -62,7 +62,7 @@
 
     Scene_Map.prototype.newSusWindow = function() {
         const rect = new Rectangle(1, 1, 1, 1);
-        const susWindow = new Window_SusMessage(rect;
+        const susWindow = new Window_SusMessage(rect);
         this._susWindow.concat(susWindow);
         this.addWindow(susWindow);
     };
@@ -72,47 +72,6 @@
         _Scene_Map_prototype_initialize.call(this);
         this.updatSusWindow();
     }
-
-    Window.prototype.move = function(x, y, width, height, tween = null) {
-        if(tween){
-            this._moving = true;
-            this._targetX = x || 0;
-            this._targetY = y || 0;
-            this._targetWidth = width || 0;
-            this._targetHeight = height || 0;
-            this._refreshAllParts();
-            return;
-        }
-        this.x = x || 0;
-        this.y = y || 0;
-        if (this._width !== width || this._height !== height) {
-            this._width = width || 0;
-            this._height = height || 0;
-            this._refreshAllParts();
-        }
-    };
-
-    var _Window_prototype_update = Window.prototype.update;
-    Window.prototype.update = function() {
-        _Window_prototype_update.call(this);
-        this._updateMoving();
-    };
-
-    Window.prototype._updateMoving = function() {
-        if(this._moving){
-            if(this.x === this._targetX 
-                && this.y === this._targetY 
-                && this.height === this._targetHeight 
-                && this.width === this._targetWidth) {
-                    delete this._targetX;
-                    delete this._targetY;
-                    delete this._targetHeight;
-                    delete this._targetWidth;
-                    delete this._mvTween;
-                    this._moving = false;
-            }
-        }
-    };
 })();
 
 Game_Message.prototype.hasFull = function(text) {

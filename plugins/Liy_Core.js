@@ -46,10 +46,49 @@
         if(isShowDevtools) SceneManager.showDevTools();
         /*try{
             GlobalVar.loadVar();
-        } catch(e) {
-
-        }*/
+        } catch(e) {}*/
         SceneManager.run(Scene_Boot);
+    };
+
+    Window.prototype.move = function(x, y, width, height, tween = null) {
+        if(tween){
+            this._moving = true;
+            this._targetX = x || 0;
+            this._targetY = y || 0;
+            this._targetWidth = width || 0;
+            this._targetHeight = height || 0;
+            this._refreshAllParts();
+            return;
+        }
+        this.x = x || 0;
+        this.y = y || 0;
+        if (this._width !== width || this._height !== height) {
+            this._width = width || 0;
+            this._height = height || 0;
+            this._refreshAllParts();
+        }
+    };
+
+    var _Window_prototype_update = Window.prototype.update;
+    Window.prototype.update = function() {
+        _Window_prototype_update.call(this);
+        this._updateMoving();
+    };
+
+    Window.prototype._updateMoving = function() {
+        if(this._moving){
+            if(this.x === this._targetX 
+                && this.y === this._targetY 
+                && this.height === this._targetHeight 
+                && this.width === this._targetWidth) {
+                    delete this._targetX;
+                    delete this._targetY;
+                    delete this._targetHeight;
+                    delete this._targetWidth;
+                    delete this._mvTween;
+                    this._moving = false;
+            }
+        }
     };
 })();
 
@@ -173,11 +212,13 @@ GlobalVar.resolveExp = function(exp){
 };
 
 GlobalVar.VarFileStream = function(isload){
-    if(isload) {
-        $globalVariable = StorageManager.loadObject("GlobalVariable");
-    } else {
-        StorageManager.saveObject("GlobalVariable", $globalVariable);
-    }
+    try{
+        if(isload) {
+            $globalVariable = StorageManager.loadObject("GlobalVariable");
+        } else {
+            StorageManager.saveObject("GlobalVariable", $globalVariable);
+        }
+    } catch{}
 };
 
 GlobalVar.loadVar = function() {
