@@ -112,165 +112,49 @@ Liy_Tween.reverse = function(pos) {
     return 1 - pos;
 };
 
-/*
-tween: {
-            easeInQuart: function(pos){
-                return Math.pow(pos, 4);
-            },
+Liy_Tween.easeInBack = function(pos){
+    var s = 1.70158;
+    return (pos)*pos*((s+1)*pos - s);
+};
 
-            easeOutQuart: function(pos){
-                return -(Math.pow((pos-1), 4) -1)
-            },
+Liy_Tween.easeOutBack = function(pos){
+    var s = 1.70158;
+    return (pos=pos-1)*pos*((s+1)*pos + s) + 1;
+};
 
-            easeInOutQuart: function(pos){
-                if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,4);
-                return -0.5 * ((pos-=2)*Math.pow(pos,3) - 2);
-            },
+Liy_Tween.easeInOutBack = function(pos){
+    var s = 1.70158;
+    if((pos/=0.5) < 1) return 0.5*(pos*pos*(((s*=(1.525))+1)*pos -s));
+    return 0.5*((pos-=2)*pos*(((s*=(1.525))+1)*pos +s) +2);
+};
 
-            easeInQuint: function(pos){
-                return Math.pow(pos, 5);
-            },
+Liy_Tween.easeInSine = function(pos){
+    return -Math.cos(pos * (Math.PI/2)) + 1;
+};
 
-            easeOutQuint: function(pos){
-                return (Math.pow((pos-1), 5) +1);
-            },
+Liy_Tween.easeOutSine = function(pos){
+    return Math.sin(pos * (Math.PI/2));
+};
 
-            easeInOutQuint: function(pos){
-                if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,5);
-                return 0.5 * (Math.pow((pos-2),5) + 2);
-            },
+Liy_Tween.easeInOutSine = function(pos){
+    return (-.5 * (Math.cos(Math.PI*pos) -1));
+};
 
-            easeInSine: function(pos){
-                return -Math.cos(pos * (Math.PI/2)) + 1;
-            },
+Liy_Tween.swingFromTo = function(pos) {
+    var s = 1.70158;
+    return ((pos/=0.5) < 1) ? 0.5*(pos*pos*(((s*=(1.525))+1)*pos - s)) :
+    0.5*((pos-=2)*pos*(((s*=(1.525))+1)*pos + s) + 2);
+};
 
-            easeOutSine: function(pos){
-                return Math.sin(pos * (Math.PI/2));
-            },
+Liy_Tween.swingFrom = function(pos) {
+    var s = 1.70158;
+    return pos*pos*((s+1)*pos - s);
+};
 
-            easeInOutSine: function(pos){
-                return (-.5 * (Math.cos(Math.PI*pos) -1));
-            },
-
-            easeInBack: function(pos){
-                var s = 1.70158;
-                return (pos)*pos*((s+1)*pos - s);
-            },
-
-            easeOutBack: function(pos){
-                var s = 1.70158;
-                return (pos=pos-1)*pos*((s+1)*pos + s) + 1;
-            },
-
-            easeInOutBack: function(pos){
-                var s = 1.70158;
-                if((pos/=0.5) < 1) return 0.5*(pos*pos*(((s*=(1.525))+1)*pos -s));
-                return 0.5*((pos-=2)*pos*(((s*=(1.525))+1)*pos +s) +2);
-            },
-
-            elastic: function(pos) {
-                return -1 * Math.pow(4,-8*pos) * Math.sin((pos*6-1)*(2*Math.PI)/2) + 1;
-            },
-
-            swingFromTo: function(pos) {
-                var s = 1.70158;
-                return ((pos/=0.5) < 1) ? 0.5*(pos*pos*(((s*=(1.525))+1)*pos - s)) :
-                0.5*((pos-=2)*pos*(((s*=(1.525))+1)*pos + s) + 2);
-            },
-
-            swingFrom: function(pos) {
-                var s = 1.70158;
-                return pos*pos*((s+1)*pos - s);
-            },
-
-            swingTo: function(pos) {
-                var s = 1.70158;
-                return (pos-=1)*pos*((s+1)*pos + s) + 1;
-            },
-
-            bounce: function(pos) {
-                if (pos < (1/2.75)) {
-                    return (7.5625*pos*pos);
-                } else if (pos < (2/2.75)) {
-                    return (7.5625*(pos-=(1.5/2.75))*pos + .75);
-                } else if (pos < (2.5/2.75)) {
-                    return (7.5625*(pos-=(2.25/2.75))*pos + .9375);
-                } else {
-                    return (7.5625*(pos-=(2.625/2.75))*pos + .984375);
-                }
-            },
-
-            bouncePast: function(pos) {
-                if (pos < (1/2.75)) {
-                    return (7.5625*pos*pos);
-                } else if (pos < (2/2.75)) {
-                    return 2 - (7.5625*(pos-=(1.5/2.75))*pos + .75);
-                } else if (pos < (2.5/2.75)) {
-                    return 2 - (7.5625*(pos-=(2.25/2.75))*pos + .9375);
-                } else {
-                    return 2 - (7.5625*(pos-=(2.625/2.75))*pos + .984375);
-                }
-            },
-
-            easeFromTo: function(pos) {
-                if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,4);
-                return -0.5 * ((pos-=2)*Math.pow(pos,3) - 2);
-            },
-
-            easeFrom: function(pos) {
-                return Math.pow(pos,4);
-            },
-
-            easeTo: function(pos) {
-                return Math.pow(pos,0.25);
-            },
-
-            linear:  function(pos) {
-                return pos
-            },
-
-        sinusoidal: function(pos) {
-            return (-Math.cos(pos*Math.PI)/2) + 0.5;
-        },
-
-        mirror: function(pos, transition) {
-            transition = transition || tween.sinusoidal;
-            if(pos<0.5)
-                return transition(pos*2);
-            else
-                return transition(1-(pos-0.5)*2);
-        },
-
-        flicker: function(pos) {
-            var pos = pos + (Math.random()-0.5)/5;
-            return tween.sinusoidal(pos < 0 ? 0 : pos > 1 ? 1 : pos);
-        },
-
-        wobble: function(pos) {
-            return (-Math.cos(pos*Math.PI*(9*pos))/2) + 0.5;
-        },
-
-        pulse: function(pos, pulses) {
-            return (-Math.cos((pos*((pulses||5)-.5)*2)*Math.PI)/2) + .5;
-        },
-
-        blink: function(pos, blinks) {
-            return Math.round(pos*(blinks||5)) % 2;
-        },
-
-        spring: function(pos) {
-            return 1 - (Math.cos(pos * 4.5 * Math.PI) * Math.exp(-pos * 6));
-        },
-
-        none: function(pos){
-            return 0
-        },
-
-        full: function(pos){
-            return 1
-        }
-}
-*/
+Liy_Tween.swingTo = function(pos) {
+    var s = 1.70158;
+    return (pos-=1)*pos*((s+1)*pos + s) + 1;
+};
 
 //-----------------------------------------------------------
 function GlobalVar() {}
