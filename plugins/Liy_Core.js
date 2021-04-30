@@ -69,7 +69,7 @@
         }
     };
 
-    var _Window_prototype_update = Window.prototype.update;
+    const _Window_prototype_update = Window.prototype.update;
     Window.prototype.update = function() {
         _Window_prototype_update.call(this);
         this._updateMoving();
@@ -108,17 +108,36 @@ Liy.resolveAllDataMap = function() {
 };
 
 //-----------------------------------------------------------
-function Liy_Tween(x, y){
+function Liy_Tween(x, y, type){
     this._maxX = x;
     this._maxY = y;
-    this._type = '';
+    this._type = tweenMap[type.toUpperCase()];
 }
 
 Liy_Tween.prototype = Object.create(Liy_Tween.prototype);
 Liy_Tween.prototype.constructor = Liy_Tween;
 
+const tweenMap = {
+    EASEINQUAD : Liy_Tween.easeInQuad, 
+    EASEOUTQUAD : Liy_Tween.easeOutQuad, 
+    EASEINOUTQUAD : Liy_Tween.easeInOutQuad, 
+    EASEINCUBIC : Liy_Tween.easeInCubic, 
+    EASEOUTCUBIC : Liy_Tween.easeOutCubic, 
+    EASEINOUTCUBIC : Liy_Tween.easeInOutCubic, 
+    EASEINBACK : Liy_Tween.easeInBack, 
+    EASEOUTBACK : Liy_Tween.easeOutBack, 
+    EASEINOUTBACK : Liy_Tween.easeInOutBack,
+    EASEINSINE : Liy_Tween.easeInSine, 
+    EASEOUTSINE : Liy_Tween.easeOutSine, 
+    EASEINOUTSINE : Liy_Tween.easeInOutSine, 
+    SWINGTO : Liy_Tween.swingTo,  
+    SWINGFROM : Liy_Tween.swingFrom, 
+    SWINGFROMTO : Liy_Tween.swingFromTo, 
+    REVERSE : Liy_Tween.reverse
+};
+
 Liy_Tween.prototype.exec = function(pos) {
-    return eval("this." + this._type + ".call(this, pos / this._maxX) * this._maxY");
+    return this._type.call(this, pos / this._maxX) * this._maxY;
 };
 
 Liy_Tween.easeInQuad =  function(pos) {
