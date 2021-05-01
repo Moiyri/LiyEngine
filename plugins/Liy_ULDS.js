@@ -127,6 +127,9 @@
                 this._uldsSprite[i].x = $dataULDSMap.layer[i].x - $gameMap.displayX() *  $gameMap.tileWidth(); 
                 this._uldsSprite[i].y = $dataULDSMap.layer[i].y - $gameMap.displayY() * $gameMap.tileHeight();
             }
+            for(i in $dataULDSMap.layer){
+                
+            }
         }
     };
 
