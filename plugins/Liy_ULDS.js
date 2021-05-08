@@ -96,40 +96,33 @@
         } catch(e) {}
     });
 
-    function Liy_ULDS(){}
-
-    Liy_ULDS.prototype = Object.create(Liy_ULDS.prototype);
-    Liy_ULDS.prototype.constructor = Liy_ULDS.prototype;  
-
     const _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
     Spriteset_Map.prototype.createTilemap = function() {
         _Spriteset_Map_prototype_createTilemap.call(this);
         if(!$dataULDSMap) return;
-        this._uldsSprite = [];
-        for(var i = 0, sprite = null; i < $dataULDSMap.layer.length; i++){
-            sprite = $dataULDSMap.layer[i].tiling | false ? new TilingSprite() : new Sprite();
-            sprite.bitmap = ImageManager.loadPicture($dataULDSMap.layer[i].name);
-            sprite.x = $dataULDSMap.layer[i].x;
-            sprite.y = $dataULDSMap.layer[i].y;
-            sprite.z = $dataULDSMap.layer[i].z;
-            sprite.blendMode = $dataULDSMap.layer[i].blendmode;
-            sprite.move(sprite.x, sprite.y, Graphics.width, Graphics.height)
-            this._uldsSprite.push(sprite);
+        $dataULDSMap.layer.forEach(layer => {
+            let sprite = layer.tiling || false ? new TilingSprite() : new Sprite();
+            sprite.bitmap = ImageManager.loadPicture(layer.name);
+            sprite.x = layer.x;
+            sprite.y = layer.y;
+            sprite.z = layer.z;
+            sprite.blendMode layer.blendMode;
+            sprite.move(layer.x, layer.y, sprite.width, sprite.height);
             this.addChild(sprite);
-        }
+            layer.sprite = sprite;
+        })
     };
 
     const _Spriteset_Map_prototype_updateTilemap = Spriteset_Map.prototype.updateTilemap;
     Spriteset_Map.prototype.updateTilemap = function() {
         _Spriteset_Map_prototype_updateTilemap.call(this);
         if($dataULDSMap){
-            for(var i = 0; i < $dataULDSMap.layer.length; i++){
-                this._uldsSprite[i].x = $dataULDSMap.layer[i].x - $gameMap.displayX() *  $gameMap.tileWidth(); 
-                this._uldsSprite[i].y = $dataULDSMap.layer[i].y - $gameMap.displayY() * $gameMap.tileHeight();
-            }
-            for(i in $dataULDSMap.layer){
-                
-            }
+            $dataULDSMap.layer.forEach(layer => {
+                layer.sprite.move(layer.x - $gameMap.displayX * $gameMap.tileWidth,
+                layer.y - $gameMap.displayY * $gameMap.tileHeight,
+                layer.sprite.width,
+                layer.sprite.height)
+            })
         }
     };
 

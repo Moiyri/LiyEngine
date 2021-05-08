@@ -108,9 +108,9 @@ Liy.resolveAllDataMap = function() {
 };
 
 //-----------------------------------------------------------
-function Liy_Tween(x, y, type){
-    this._maxX = x;
-    this._maxY = y;
+function Liy_Tween(point, type, timeWait){
+    this._point = point;
+    this._timeWait = timeWait + 0 || 0; 
     this._type = tweenMap[type.toUpperCase()];
 }
 
@@ -136,9 +136,9 @@ const tweenMap = {
     REVERSE : Liy_Tween.reverse
 };
 
-Liy_Tween.prototype.exec = function(pos) {
-    return this._type.call(this, pos / this._maxX) * this._maxY;
-};
+Liy_Tween.prototype.posistion = function(tick) {
+    return;
+}
 
 Liy_Tween.easeInQuad =  function(pos) {
     return Math.pow(pos, 2);
