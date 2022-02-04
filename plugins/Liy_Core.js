@@ -18,6 +18,12 @@
  * @default null
  * @text Expression
  * @desc The operation expression.
+ * 
+ * @command test
+ * 
+ * @arg param1
+ * 
+ * @arg param2
  */
 
 (() =>{
@@ -30,6 +36,10 @@
     PluginManager.registerCommand(pluginName, "globalvar", args => {
         let expession = args.Expression;
         GlobalVar.resolveExp(expession);
+    });
+
+    PluginManager.registerCommand(pluginName, "test", args => {
+        console.log(Liy_Tween.calcPosistion(Number(args.param1), Number(args.param2), 1, "easeinquad"));
     });
 
 //-----------------------------------------------------------
@@ -96,6 +106,7 @@
 function Liy() {}
 
 var $dataULDSMap = null;
+var $dataFLashlight = null;
 var $dataLiyScenes = null;
 
 var $testVar = [];
@@ -108,9 +119,9 @@ Liy.resolveAllDataMap = function() {
 };
 
 //-----------------------------------------------------------
-function Liy_Tween(point, type, timeWait){
-    this._point = point;
-    this._timeWait = timeWait + 0 || 0; 
+function Liy_Tween(x, y, type){
+    this._maxX = x;
+    this._maxY = y;
     this._type = tweenMap[type.toUpperCase()];
 }
 
@@ -136,8 +147,10 @@ const tweenMap = {
     REVERSE : Liy_Tween.reverse
 };
 
-Liy_Tween.prototype.posistion = function(tick) {
-    return;
+Liy_Tween.calcPosistion = function(last, duration, type) {
+    if(!type) return last / duration;
+    let _type = tweenMap[type.toUpperCase()];
+    return _type.call(this, last / duration);
 }
 
 Liy_Tween.easeInQuad =  function(pos) {
@@ -149,7 +162,7 @@ Liy_Tween.easeOutQuad = function(pos) {
 };
 
 Liy_Tween.easeInOutQuad = function(pos) {
-    if ((pos/=0.5) < 1) return 0.5*Math.pow(pos,2);
+    if ((pos/=0.5) < 1) return 0.5 * Math.pow(pos,2);
     return -0.5 * ((pos-=2)*pos - 2);
 };
 

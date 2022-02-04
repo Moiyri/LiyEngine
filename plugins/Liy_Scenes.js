@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc To expand the function of initial scene, belongs to LiyEngine.
+ * @plugindesc To expand the function of initial scene, belonged to LiyEngine.
  * @author: Moiyri
  * 
  * @param Stay Time
