@@ -162,7 +162,7 @@
 
         var light;
         light.sprite = new Sprite();
-        light.sprite.bitmap = ImageManager.loadPicture(_name);
+        light.sprite.bitmap = ImageManager.loadBitmap("img/pictures", _name);
         light.id = flId;
         light.characterId = _characterId;
         light.x = _x;
@@ -186,12 +186,12 @@
         if(!$dataULDSMap) return;
         $dataULDSMap.layer.forEach(layer => {
             let sprite = layer.tiling || false ? new TilingSprite() : new Sprite();
-            sprite.bitmap = ImageManager.loadPicture(layer.name);
+            sprite.bitmap = ImageManager.loadBitmap("img/pictures", layer.name);
             sprite.x = layer.x;
             sprite.y = layer.y;
             sprite.z = layer.z;
-            sprite.blendMode = Number(layer.blendMode) || 0;
-            sprite.opacity = Number(layer.opacity) || 255;
+            sprite.blendMode = layer.blendMode;
+            sprite.opacity = layer.opacity;
             sprite.move(layer.x - $gameMap.displayX() * $gameMap.tileWidth(), 
                 layer.y - $gameMap.displayY() * $gameMap.tileHeight(), 
                 sprite.width, sprite.height);
