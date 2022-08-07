@@ -61,29 +61,143 @@
     });
 
 //-----------------------------------------------------------
-
-    var _Window_Base_prototype_initialize = Window_Base.prototype.initialize;
+var _Window_Base_prototype_initialize = Window_Base.prototype.initialize;
     Window_Base.prototype.initialize = function(rect) {
         _Window_Base_prototype_initialize.call(this, rect);
-        this.initTarget();
+        this.initMoving();
     }
 
-    Window_Base.prototype.initTarget = function() {
-        this._targetX = this.x;
-        this._targetY = this.y;
-        this._targetOpacity = this.opacity;
+    Window_Base.prototype.initMoving = function() {
+        this._duration = 0;
+        this._wholeDuration = 0;
+        this._isMoving = false;
+        this._startX = 0;
+        this._startY = 0;
+        this._targetX = this._x;
+        this._targetY = this._y;
+        this._easingType = null;
+        this._targetOpacity = this._opacity;
     };
 
-    Sprite.prototype.initialize = function() {
-        
+    Window_Base.prototype.move = function(x, y, width, height, easingType, duration) {
+        if(easingType && (duration > 0)) {
+            this.width = width;
+            this.height = height;
+            this._startX = this.x;
+            this._startY = this.y;
+            this._targetX = x;
+            this._targetY = y;
+            this._duration = duration;
+            this._wholeDuration = duration;
+            this._easingType = easingType;
+            this._isMoving = true;
+        } else {
+            this.x = x || 0;
+            this.y = y || 0;
+            if (this._width !== width || this._height !== height) {
+                this._width = width || 0;
+                this._height = height || 0;
+                this._refreshAllParts();
+            }
+        }
+    }
+
+    var _Window_Base_prototype_update = Window_Base.prototype.update;
+    Window_Base.prototype.update = function() {
+        _Window_Base_prototype_update.call(this);
+        if(this.isMoving()) {
+            this.updateMove()
+            if(this.duration <= 0) {
+                this._isMoving = false;
+            }
+        }
+    };
+
+    Window_Base.prototype.updateMove = function() {
+        if(this._duration > 0) {
+            this.x = this.applyEasing(this._startX, this._targetX);
+            this.y = this.applyEasing(this._startY, this._targetY);
+            this._duration --;
+        }
+    };
+
+    Window_Base.prototype.applyEasing = function(start, target) {
+        const type = this._easingType;
+        const d = this._duration;
+        const wd = this._wholeDuration;
+        const lt = Liy_Tween.calcPosition((wd - d) / wd, type);
+
+        return lt * (target - start) + start;
+    }
+
+    Window_Base.prototype.isMoving = function() {
+        return this._isMoving;
+    };
+
+    var _Sprite_prototype_initialize  = Sprite.prototype.initialize;
+    Sprite.prototype.initialize = function(bitmap) {
+        _Sprite_prototype_initialize.call(this, bitmap);
+        this.initMove();
+    };
+
+    Sprite.prototype.initMove = function() {
+        this._easingType = null;
+        this._startX = 0;
+        this._startY = 0;
+        this._targetX = this._x;
+        this._targetY = this._x;
+        this._duration = 0;
+        this._wholeDuration = 0;
+        this._isMoving = false;
     }
 
     var _Sprite_prototype_update = Sprite.prototype.update;
     Sprite.prototype.update = function() {
         _Sprite_prototype_update.call(this);
+        if(this._isMoving) {
+            this.updateMove();
+            if(this._duration <= 0) {
+                this._isMoving = false;
+            }
+        }
     };
 
-    Window_Base.prototype.
+    Sprite.prototype.move = function(x, y, easingType, duration) {
+        if(easingType && duration > 0) {
+            this._easingType = easingType;
+            this._startX = this.x;
+            this._startY = this.y;
+            this._targetX = x;
+            this._targetY = y;
+            this._duration = duration;
+            this._wholeDuration = duration;
+            this._isMoving = true;
+        } else {
+            this.x = x;
+            this.y = y;
+        }
+    };
+
+    Sprite.prototype.updateMove = function() {
+        if(this._duration > 0) {
+            this.x = this.applyEasing(this._startX, this._targetX);
+            this.y = this.applyEasing(this._startY, this._targetY);
+            this._duration --;
+        }
+    }
+
+    Sprite.prototype.isMoving = function() {
+        return this._isMoving;
+    }
+
+    Sprite.prototype.applyEasing = function(start, target) {
+        const type = this._easingType;
+        const d = this._duration;
+        const wd = this._wholeDuration;
+        const lt = Liy_Tween.calcPosition((wd - d) / wd, type);
+
+        return lt * (target - start) + start;
+    }
 
     Scene_Map.prototype.onMapLoaded = function() {
         if (this._transfer) {
@@ -133,47 +247,7 @@
         } catch(e) {}*/
         SceneManager.run(Scene_Boot);
     };
-
-    Window.prototype.move = function(x, y, width, height, tween = null) {
-        if(tween){
-            this._moving = true;
-            this._targetX = x || 0;
-            this._targetY = y || 0;
-            this._targetWidth = width || 0;
-            this._targetHeight = height || 0;
-            this._refreshAllParts();
-            return;
-        }
-        this.x = x || 0;
-        this.y = y || 0;
-        if (this._width !== width || this._height !== height) {
-            this._width = width || 0;
-            this._height = height || 0;
-            this._refreshAllParts();
-        }
-    };
-
-    const _Window_prototype_update = Window.prototype.update;
-    Window.prototype.update = function() {
-        _Window_prototype_update.call(this);
-        this._updateMoving();
-    };
-
-    Window.prototype._updateMoving = function() {
-        if(this._moving){
-            if(this.x === this._targetX 
-                && this.y === this._targetY 
-                && this.height === this._targetHeight 
-                && this.width === this._targetWidth) {
-                    delete this._targetX;
-                    delete this._targetY;
-                    delete this._targetHeight;
-                    delete this._targetWidth;
-                    delete this._mvTween;
-                    this._moving = false;
-            }
-        }
-    };
+    
     //-----------------------------------------------------------
     Input.keyMapper = {
         9: "tab", // tab
@@ -377,36 +451,6 @@ Liy_Tween.swingTo = function(pos) {
 };
 
 //-----------------------------------------------------------
-var $globalVariable = new Map();
-
-class GlobalVar {
-    static resolveStatement(exp) {
-        let reg = new RegExp(/\w.*((=)|(+=)|(-=)|(\/=))/g);
-        eval(exp);
-        for(i in exp.match(reg)){
-            eval("$globalVar." + i + " = " + eval(i));
-        }
-    }
-
-    static varFileStream(isLoad) {
-        try{
-            if(isLoad) {
-                $globalVariable = StorageManager.loadObject("GlobalVariable");
-            } else {
-                StorageManager.saveObject("GlobalVariable", $globalVariable);
-            }
-        } catch{}
-    }
-
-    static loadVariable() {
-        this.varFileStream(true);
-        $globalVariable.forEach(variable => {
-            eval("var " + variable + " = " + $globalVar[variable]);
-        })
-    }
-}
-
-//-----------------------------------------------------------
 
 var l_isPressed = function(keyName) {
     return Input.isPressed(keyName);
@@ -429,6 +473,10 @@ class Liy_Easing{
         this._targetOpacity = targetOpacity;
         this._duration = 0; //frames
         this._wholeDuration = duration; // frames
+    }
+
+    applyEasing() {
+
     }
 
     processEasing() {
