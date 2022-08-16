@@ -9,26 +9,42 @@
  * @text Show Devtools
  * @desc Show Devtools when running.
  * 
- * @param inputSettins
+ * @param inputSettings
  * @text Input Settings
  * 
  * @param accessF3
  * @type boolean
  * @default true
  * @text Is access F3 input.
- * @parent inputSettins
+ * @parent inputSettings
  * 
  * @param accessF4
  * @type boolean
  * @default true
  * @text Is access F4 input.
- * @parent inputSettins
+ * @parent inputSettings
  * 
  * @param accessF5
  * @type boolean
  * @default true
  * @text Is access F5 input.
- * @parent inputSettins
+ * @parent inputSettings
+ * 
+ * @param titleVideo
+ * @text Title Video
+ * @default
+ * @type string
+ * 
+ * @param titleVideoMuted
+ * @text Title Video Muted
+ * @default true
+ * @type boolean
+ * @parent titleVideo
+ * 
+ * @param titleVideoLoop
+ * @text Title Video Loop
+ * @type boolean
+ * @parent titleVideo
  * 
  * 
  * @command globalVariable
@@ -40,24 +56,20 @@
  * @type multiline_string
  */
 
-function paramJsonParse(key, value) {
-    try {
-        return JSON.parse(value);
-    } catch(e) {
-        return value ? value : null;
-    }
-}
-
 (() =>{
     const pluginName = "Liy_Core";
+    const params = PluginManager.parameters(pluginName);
 
-    var params = PluginManager.parameters(pluginName);
+    const isShowDevtools = params["showDevtools"] === "true" ? true : false;
 
-    var isShowDevtools = params["showDevtools"] === "true" ? true : false;
+    const isAccessF3 = params["F3"] === "true" ? true : false;
+    const isAccessF4 = params["F4"] === "true" ? true : false;
+    const isAccessF5 = params["F5"] === "true" ? true : false;
 
-    var isAccessF3 = params["F3"] === "true" ? true : false;
-    var isAccessF4 = params["F4"] === "true" ? true : false;
-    var isAccessF5 = params["F5"] === "true" ? true : false;
+    const titleVideo = JSON.parse(JSON.stringify(params["titleVideo"], 
+        paramJsonParse));
+    const titleVideoMuted = params["titleVideoMuted"] === "true" ? true : false;
+    const titleVideoLoop = params["titleVideoLoop"] === "true" ? true : false;
     
     //globalvar expression
     PluginManager.registerCommand(pluginName, "globalVariable", args => {
@@ -163,7 +175,29 @@ function paramJsonParse(key, value) {
         120: "debug" // F9
     };
 
+    var _Scene_Title_prototype_createBackground = Scene_Title.prototype.createBackground;
+    Scene_Title.prototype.createBackground = function() {
+        _Scene_Title_prototype_createBackground.call(this);
+        this._videoSprite = new Sprite();
+        if(titleVideo) {
+            const texture = PIXI.Texture.from(titleVideo);
+            let src = texture.baseTexture.source;
+            src.muted = titleVideoMuted;
+            src.loop = titleVideoLoop;
+            this._videoSprite.texture = texture;
+        }
+        this.addChild(this._videoSprite);
+    }
 })();
+
+//==============================================================================
+function paramJsonParse(key, value) {
+    try {
+        return JSON.parse(value);
+    } catch(e) {
+        return value ? value : null;
+    }
+}
 
 //==============================================================================
 var $dataULDSLayer = null;
