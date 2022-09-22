@@ -5,6 +5,7 @@
  * @url https://github.com/Moiyri/LiyEngine
  * 
  * @help Liy_Graphics.js
+ * VERSION: 1.0.0
  * 
  * This plugin is a module of LiyEngine, which manage graphics.
  * 
@@ -31,11 +32,15 @@
  * @param light
  * @text Light
  * 
- * @command MapLayer
+ * @command mapLayer
  * @text Map Layer
  * 
- * @arg mapId
- * @text Map Id
+ * @arg tag
+ * @text Tag
+ * 
+ * @arg operation
+ * @text Operation
+ * @type select
  */
 
 /*~struct~Map:
@@ -71,6 +76,7 @@
  * @param _mlTag
  * @text Tag
  * @default Default
+ * @help Tag of layer to for locating.
  * 
  * @param mlParameters
  * @text Parameters
@@ -109,10 +115,9 @@
  * @default 1
  * @parent mlFollow
  * 
- * @param zIndex
+ * @param z
  * @text Z
  * @default 0
- * @type number
  * @parent mlParameters
  * 
  * @param scaleX
@@ -1039,6 +1044,8 @@ class Liy_Multilayer {
             return $gameMap.adjustY(0) * $gameMap.tileHeight() * rate + y;
         }
 
+        console.log(setting);
+
         // class Timer {
         //     constructor(time) {
         //         this.time = time;
@@ -1292,7 +1299,7 @@ function paramJsonParse(key, value) {
                 // console.log(layerSprite);
                 // const layerSprite2 = new Sprite(ImageManager.loadBitmap("img/pictures/", layer.layerBitmap));
                 // console.log(layerSprite2);
-                this._baseSprite.addChild(layerSprite);
+                this._tilemap.addChild(layerSprite);
                 // this.addChild(layerSprite);
                 // this._baseSprite.addChild(layerSprite2);
             });
