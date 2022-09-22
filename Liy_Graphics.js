@@ -2,56 +2,148 @@
  * @target MZ
  * @plugindesc The manager of graphics.
  * @author Moiyri
+ * @url https://github.com/Moiyri/LiyEngine
  * 
  * @help Liy_Graphics.js
  * 
- * @param uldsSettings
- * @text ULDS Settings
+ * This plugin is a module of LiyEngine, which manage graphics.
  * 
- * @param layers
- * @text Layer
- * @parent uldsSettings
+ * Multilayer System:
+ * 1.Open Plugin Manager in editor, and select to settings of Liy_Graphics.
+ * 2.Select Map Layer Setting, now you can double click a blank line to create a
+ *   setting of one map by assigning ID of the map.
+ * 3.Double click parameter Layers to edit properties of layers diplaying on map.
+ * 4.Double click a blank line to create a new layer, to make sure which can be 
+ *   displayed correctly, the parameter Layer Bitmap is required.
+ * 5.Futher ways to make the multilayer better is using script, which include lots
+ *   of method to manage your layer.
+ * 
+ * 
+ * @param multilayer
+ * @text Multilayer
+ * 
+ * @param mapLayerSetting
+ * @text Map Layer Setting
  * @default []
- * @type struct<Layer>[]
+ * @type struct<Map>[]
+ * @parent multilayer
  * 
+ * @param light
+ * @text Light
+ * 
+ * @command MapLayer
+ * @text Map Layer
+ * 
+ * @arg mapId
+ * @text Map Id
  */
 
-/*~struct~Layer:
+/*~struct~Map:
  *
- * @param uid
- * @text UUID
- * @default
+ * @param mapId
+ * @text Map Id
  * @type number
+ * @default
  * 
+ * @param layers
+ * @text Layers
+ * @type struct<LayerSprite>[]
+ */
+
+/*~struct~LayerSprite:
  * @param layerBitmap
  * @text Layer Bitmap
  * @default
  * @type file
  * @dir /img/pictures/
+ * @help Bitmap to load.
+ * 
+ * @param mode
+ * @text Mode
+ * @type select
+ * @option Follow
+ * @value Follow
+ * @option Normal
+ * @value Normal
+ * @default Normal
+ * @help Ways to display sprite.
+ * 
+ * @param _mlTag
+ * @text Tag
+ * @default Default
+ * 
+ * @param mlParameters
+ * @text Parameters
+ * 
+ * @param mlFollow
+ * @text Follow Setting
+ * 
+ * @param originX
+ * @text Origin X
+ * @default 0
+ * @parent tilling
+ * 
+ * @param originY
+ * @text Origin Y
+ * @default 0
+ * @parent tilling
  * 
  * @param x
  * @text X
  * @default 0
- * @type number
+ * @parent mlParameters
+ * 
+ * @param offsetRateX
+ * @text Offset Rate X
+ * @default 1
+ * @parent mlFollow
+ * @help Follow Mode Only.
  * 
  * @param y
  * @text Y
  * @default 0
- * @type number
+ * @parent mlParameters
  * 
- * @param z
+ * @param offsetRateY
+ * @text Offset Rate Y
+ * @default 1
+ * @parent mlFollow
+ * 
+ * @param zIndex
  * @text Z
  * @default 0
  * @type number
+ * @parent mlParameters
+ * 
+ * @param scaleX
+ * @text Scale X （%）
+ * @default 100
+ * @type number
+ * @min 0
+ * @parent mlParameters
+ * 
+ * @param scaleY
+ * @text Scale Y （%）
+ * @default 100
+ * @type number
+ * @min 0
+ * @parent mlParameters
+ * 
+ * @param rotation
+ * @text Rotation
+ * @default 0
+ * @type number
+ * @parent mlParameters
  * 
  * @param opacity
  * @text Opacity
  * @default 255
  * @type number
+ * @parent mlParameters
  * 
  * @param blendMode
  * @text Blend Mode
- * @deault Normal
+ * @default 0
  * @type select
  * @option Normal
  * @value 0
@@ -61,6 +153,33 @@
  * @value 2
  * @option Screen
  * @value 3
+ * @parent mlParameters
+ * 
+ * @param tilling
+ * @text Tilling
+ * @default false
+ * @type boolean
+ * @parent mlParameters
+ * 
+ * @param visible
+ * @text Visible
+ * @default true
+ * @type boolean
+ * @parent mlParameters
+ * 
+ * @param script
+ * @text Script
+ * @default
+ * onUpdate = function() {
+ * //TODO: Add code here
+ * };
+ * @type multiline_string
+ * @parent mlParameters
+ * 
+ * @param commandList
+ * @text Command List
+ * @type string[]
+ * @parent mlParameters
  * 
  */
 
@@ -820,57 +939,177 @@ var Tween = /** @class */ (function () {
     };
     return Tween;
 }());
+// var VERSION = '18.6.4';
 
-var VERSION = '18.6.4';
+//The above is about Tween.js on github.
+//Now the following is Liy.
 
-/**
- * Tween.js - Licensed under the MIT license
- * https://github.com/tweenjs/tween.js
- * ----------------------------------------------
- *
- * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
- * Thank you all, you're awesome!
- */
-var nextId = Sequence.nextId;
-/**
- * Controlling groups of tweens
- *
- * Using the TWEEN singleton to manage your tweens can cause issues in large apps with many components.
- * In these cases, you may want to create your own smaller groups of tweens.
- */
-var TWEEN = mainGroup;
-// This is the best way to export things in a way that's compatible with both ES
-// Modules and CommonJS, without build hacks, and so as not to break the
-// existing API.
-// https://github.com/rollup/rollup/issues/1961#issuecomment-423037881
-var getAll = TWEEN.getAll.bind(TWEEN);
-var removeAll = TWEEN.removeAll.bind(TWEEN);
-var add = TWEEN.add.bind(TWEEN);
-var remove = TWEEN.remove.bind(TWEEN);
-var update = TWEEN.update.bind(TWEEN);
-var exports = {
-    Easing: Easing,
-    Group: Group,
-    Interpolation: Interpolation,
-    now: now$1,
-    Sequence: Sequence,
-    nextId: nextId,
-    Tween: Tween,
-    VERSION: VERSION,
-    getAll: getAll,
-    removeAll: removeAll,
-    add: add,
-    remove: remove,
-    update: update,
-};
+// class Sprite_Multilayer extends Sprite {
 
-//export default exports;
-//export { Easing, Group, Interpolation, Sequence, Tween, VERSION, add, getAll, nextId, now$1 as now, remove, removeAll, update };
+// }
+
+// class Sprite_TilingMultilayer extends TilingSprite {
+
+// }
+
+class Liy_Multilayer {
+    static mapLayerData = {};
+
+    static resolveMapLayerData(mapLayers) {
+        mapLayers.forEach((mapLayer) => {
+            if(mapLayer.layers) {
+                this.mapLayerData[mapLayer.mapId] = mapLayer.layers;
+            }
+        });
+    }
+
+    static loadMapLayerData(mapId) {
+        return mapId ? this.mapLayerData[mapId] || null : this.mapLayerData;
+    }
+
+    static getLayerSprite(setting) {
+        const _tilling = setting.tilling;
+        const sprite = _tilling ? new TilingSprite() : new Sprite();
+        console.log(sprite)
+        const _setting = JSON.parse(JSON.stringify(setting));
+        const _script = _setting.script;
+        const _mode = _setting.mode;
+        // _setting.scale;
+        _setting.scale = sprite.scale;
+        _setting.scale.x = _setting.scaleX / 100;
+        _setting.scale.y = _setting.scaleY / 100;
+        sprite.bitmap = ImageManager.loadBitmap("img/pictures/", setting.layerBitmap);
+        if(_tilling) {
+            _setting.origin = sprite.origin;
+            _setting.origin.x = _setting.originX;
+            _setting.origin.y = _setting.originY;
+            sprite.width = Graphics.boxHeight;
+            sprite.height = Graphics.boxWidth;
+        };
+        
+        delete _setting.tilling;
+        delete _setting.scaleX;
+        delete _setting.scaleY;
+        delete _setting.layerBitmap;
+        delete _setting.script;
+        delete _setting.mode;
+        delete _setting.commandList;
+        delete _setting.originX;
+        delete _setting.originY;
+        delete _setting.mlFollow;
+        delete _setting.mlParameters;
+        delete _setting.blendMode;
+
+        for(let key in _setting) {
+            sprite[key] = _setting[key];
+        }
+
+        const _scriptInterpreter = this.scriptHelper.bind(sprite);
+        //CODE
+        _scriptInterpreter(_script, _setting, _mode === "Follow", _tilling);
+
+        return sprite;
+    }
+
+    // Context Sprite required
+    static scriptHelper(code, setting, isFollow, isTilling) {
+        var onUpdate;
+        var onInitialize;
+        var onDestroy;
+        var onMove;
+
+        var parameters = {};
+
+        var clearParallel = function() {
+            clearInterval(parallelTimer);
+        };
+
+        var switches = function(index){
+            return $gameSwitches.value(index) || false;
+        };
+        var variables = function(index){
+            return $gameVariables.value(index) || 0;
+        };
+
+        var rx = function(x = 0, rate = 1) {
+            return $gameMap.adjustX(0) * $gameMap.tileWidth() * rate + x;
+        }
+
+        var ry = function(y = 0, rate = 1) {
+            return $gameMap.adjustY(0) * $gameMap.tileHeight() * rate + y;
+        }
+
+        // class Timer {
+        //     constructor(time) {
+        //         this.time = time;
+        //     }
+
+        //     update() {
+        //         if(this.time > 0) {
+        //             this.time --;
+        //         }
+        //     }
+
+        //     isOver() {
+        //         return this.time <= 0;
+        //     }
+        // }
+
+        var parallelTimer;
+        var parallel = function(callback, timeOut, interval, trigger = true){
+            setTimeout(() => {
+                parallelTimer = setInterval(() => {
+                    if(trigger) {
+                        callback();
+                    }
+                }, interval);
+            }, timeOut || 0);
+        }.bind(this);
+
+        eval(code);
+
+        if(isFollow) {
+            this._updateCallback.push(() => {
+                this.x = rx(setting.x, setting.offsetRateX);
+                this.y = ry(setting.y, setting.offsetRateY);
+            })
+        }
+
+        if(onUpdate)
+            this._updateCallback.push(onUpdate.bind(this));
+        if(onDestroy)
+            this._destroyCallback.push(onDestroy.bind(this));
+        if(onMove)
+            this._moveCallback.push(onDestroy.bind(this));
+        if(onInitialize)
+            this._initializeCallback.push(onInitialize.bind(this));
+    }
+}
+
+function paramJsonParse(key, value) {
+    try {
+        return key === "script" ? value : JSON.parse(value);
+    } catch(e) {
+        return value ? value : null;
+    }
+}
 
 (() => {
+    try {
+        new Liy();
+    } catch(e) {
+        throw Error("Couldn't load Liy main module of undefined.");
+    }
+
     const pluginName = "Liy_Graphics";
 
-    var params = PluginManager.parameters(pluginName);
+    const params = PluginManager.parameters(pluginName);
+
+    try{
+        const mapLayers = JSON.parse(JSON.stringify(params["mapLayerSetting"],
+            paramJsonParse));
+        Liy_Multilayer.resolveMapLayerData(mapLayers);
+    } catch {}
 
     //==========================================================================
     //Button hovered effects
@@ -910,14 +1149,13 @@ var exports = {
     //==========================================================================
     // Easing of Windows and Sprites
     //==========================================================================
-    var _Window_Base_prototype_initialize = Window_Base.prototype.initialize;
+    const _Window_Base_prototype_initialize = Window_Base.prototype.initialize;
     Window_Base.prototype.initialize = function(rect) {
         _Window_Base_prototype_initialize.call(this, rect);
         this.initEasing();
-        //console.log(this)
     }
 
-    var _Window_Base_prototype_update = Window_Base.prototype.update;
+    const _Window_Base_prototype_update = Window_Base.prototype.update;
     Window_Base.prototype.update = function() {
         _Window_Base_prototype_update.call(this);
         this._tween.update();
@@ -933,10 +1171,10 @@ var exports = {
         this._tween = new Tween(this._easingTargets)
             .onUpdate(() => {
                 const easingTargets = this._easingTargets;
-                this.x = Math.floor(easingTargets.x || this.x);
-                this.y = Math.floor(easingTargets.y || this.y);
-                this.width = Math.floor(easingTargets.width || this.width);
-                this.height = Math.floor(easingTargets.height || this.height);
+                this.x = easingTargets.x || this.x;
+                this.y = easingTargets.y || this.y;
+                this.width = easingTargets.width || this.width;
+                this.height = easingTargets.height || this.height;
             })
     }; 
 
@@ -952,26 +1190,185 @@ var exports = {
         }
         return this._tween;
     };
-    
-    //==========================================================================
-    // ULDS
-    //==========================================================================
-    var allLayers = JSON.parse(JSON.stringify(params['layers'], paramJsonParse));
-    
-    const _Spriteset_Map_prototype_createTilemap = Spriteset_Map.prototype.createTilemap;
-    Spriteset_Map.prototype.createTilemap = function() {
-        _Spriteset_Map_prototype_createTilemap.call(this);
-    };
-    
-    const _Spriteset_Map_prototype_updateTilemap = Spriteset_Map.prototype.updateTilemap;
-    Spriteset_Map.prototype.updateTilemap = function() {
-        _Spriteset_Map_prototype_updateTilemap.call(this);
-    };
-    
-    const _Scene_Map_prototype_onTransfer = Scene_Map.prototype.onTransfer;
-    Scene_Map.prototype.onTransfer = function() {
-        _Scene_Map_prototype_onTransfer.call(this);
-        //$dataULDSMap = null;
+
+    const _TilingSprite_prototype_initialize = TilingSprite.prototype.initialize;
+    TilingSprite.prototype.initialize = function() {
+        _TilingSprite_prototype_initialize.call(this);
+        if(this._initializeCallback.length > 0) {
+            this._initializeCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+    }
+
+    TilingSprite.prototype.update = function() {
+        for (const child of this.children) {
+            if (child.update) {
+                child.update();
+            }
+        }
+        if(this._updateCallback.length > 0) {
+            this._updateCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
     };
 
+    const _TilingSprite_prototype_move = TilingSprite.prototype.move;
+    TilingSprite.prototype.move = function() {
+        _TilingSprite_prototype_move.call(this);
+        if(this._moveCallback.length > 0) {
+            this._moveCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+    }
+
+    TilingSprite.prototype.destroy = function() {
+        const options = { children: true, texture: true };
+        if(this._destroyCallback.length > 0) {
+            this._destroyCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+        PIXI.TilingSprite.prototype.destroy.call(this, options);
+    };
+
+    const _Sprite_prototype_initialize = Sprite.prototype.initialize;
+    Sprite.prototype.initialize = function(bitmap) {
+        _Sprite_prototype_initialize.call(this, bitmap);
+        this.initEasing();
+        if(this._initializeCallback.length > 0) {
+            this._initializeCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+    };
+
+    Sprite.prototype.initEasing = function() {
+        this._easingTargets = {
+            x: 0,
+            y: 0,
+            scaleX: 0,
+            scaleY: 0,
+            opacity: 0
+        }
+
+        this._tween = new Tween(this._easingTargets)
+            .onUpdate(() => {
+                const easingTargets = this._easingTargets;
+                this.x = easingTargets.x || this.x;
+                this.y = easingTargets.y || this.y;
+                this.scale.x = easingTargets.scaleX || this.scale.x;
+                this.scale.y = easingTargets.scaleY || this.scale.y;
+                this.opacity = easingTargets.opacity || this.opacity;
+            });
+    };
+
+    Sprite.prototype.move = function(x, y) {
+        if(this._moveCallback.length > 0) {
+            this._moveCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+        this.x = x || this.x;
+        this.y = y || this.y;
+        return this._tween;
+    }
+
+    const _Spriteset_Map_prototype_createLowerLayer = Spriteset_Map.prototype.createLowerLayer;
+    Spriteset_Map.prototype.createLowerLayer = function() {
+        _Spriteset_Map_prototype_createLowerLayer.call(this);
+        this.createOtherTilemap();
+    };
+
+    Spriteset_Map.prototype.createOtherTilemap = function() {
+        const layers = Liy_Multilayer.loadMapLayerData();
+        const mapId = $gameMap.mapId();
+        const layersData = layers[mapId];
+        if(layersData) {
+            layersData.forEach((layer) => {
+                const layerSprite = Liy_Multilayer.getLayerSprite(layer);
+                // console.log(layerSprite);
+                // const layerSprite2 = new Sprite(ImageManager.loadBitmap("img/pictures/", layer.layerBitmap));
+                // console.log(layerSprite2);
+                this._baseSprite.addChild(layerSprite);
+                // this.addChild(layerSprite);
+                // this._baseSprite.addChild(layerSprite2);
+            });
+        }
+        // console.trace();
+        // console.log($gameMap.mapId());
+    };
+
+    Object.defineProperty(Sprite.prototype, "_updateCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(Sprite.prototype, "_destroyCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(Sprite.prototype, "_moveCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(Sprite.prototype, "_initializeCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(TilingSprite.prototype, "_updateCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(TilingSprite.prototype, "_destroyCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(TilingSprite.prototype, "_moveCallback", {
+        value: [],
+        configurable: true
+    });
+
+    Object.defineProperty(TilingSprite.prototype, "_initializeCallback", {
+        value: [],
+        configurable: true
+    });
+
+    const _Sprite_prototype_destory = Sprite.prototype.destroy;
+    Sprite.prototype.destroy = function() {
+        _Sprite_prototype_destory.call(this);
+        if(this._destroyCallback.length > 0) {
+            this._destroyCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+    }
+
+    Sprite.prototype.update = function() {
+        this._tween.update();
+        for (const child of this.children) {
+            if (child.update) {
+                child.update();
+            }
+        }
+        if(this._updateCallback.length > 0) {
+            this._updateCallback.forEach((callBack) => {
+                callBack();
+            });
+        }
+    };
+    
+    // const _Scene_Map_prototype_onTransfer = Scene_Map.prototype.onTransfer;
+    // Scene_Map.prototype.onTransfer = function() {
+    //     _Scene_Map_prototype_onTransfer.call(this);
+    //     const newmapId = $gamePlayer.newmapId();
+    // };
+    
 })();

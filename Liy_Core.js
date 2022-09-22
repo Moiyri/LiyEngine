@@ -2,12 +2,21 @@
  * @target MZ
  * @plugindesc The core of LiyEngine
  * @author Moiyri
+ * 
+ * @param globalVariables
+ * @text Global Variables
+ * @default []
+ * @type string[]
+ * 
+ * @param devSettings
+ * @text Development Settings
  *
  * @param showDevtools
  * @type boolean
  * @default false
  * @text Show Devtools
  * @desc Show Devtools when running.
+ * @parent devSettings
  * 
  * @param inputSettings
  * @text Input Settings
@@ -15,20 +24,29 @@
  * @param accessF3
  * @type boolean
  * @default true
- * @text Is access F3 input.
+ * @text Access F3 input.
  * @parent inputSettings
  * 
  * @param accessF4
  * @type boolean
  * @default true
- * @text Is access F4 input.
+ * @text Access F4 input.
  * @parent inputSettings
  * 
  * @param accessF5
  * @type boolean
  * @default true
- * @text Is access F5 input.
+ * @text Access F5 input.
  * @parent inputSettings
+ * 
+ * @param webSettings
+ * @text Web Settings
+ * 
+ * @param bodyBackground
+ * @text Document Body Background
+ * @type file
+ * @dir /img
+ * @parent webSettings
  * 
  * @param titleVideo
  * @text Title Video
@@ -43,8 +61,82 @@
  * 
  * @param titleVideoLoop
  * @text Title Video Loop
+ * @default true
  * @type boolean
  * @parent titleVideo
+ * 
+ * @param titleVideoPoster
+ * @text Title Video Poster
+ * @desc Image to show when video was failed.
+ * @default
+ * @type file
+ * @dir /img/pictures
+ * @parent titleVideo
+ * 
+ * @param titleSettings
+ * @text Title Commands
+ * 
+ * @param titleNewGame
+ * @text New Game
+ * @default true
+ * @type boolean
+ * @parent titleSettings
+ * 
+ * @param titleContinue
+ * @text Continue
+ * @default true
+ * @type boolean
+ * @parent titleSettings
+ * 
+ * @param titleOptions
+ * @text Options
+ * @default true
+ * @type boolean
+ * @parent titleSettings
+ * 
+ * @param titleExit
+ * @text Exit
+ * @default true
+ * @type boolean
+ * @parent titleSettings
+ * 
+ * @param titleExitText
+ * @text Text
+ * @default Exit
+ * @type string
+ * @parent titleExit
+ * 
+ * @param titleFadeSpeed
+ * @text Fade Speed
+ * 
+ * @param titleFadeIn
+ * @text In
+ * @default 24
+ * @type number
+ * @min 1
+ * @parent titleFadeSpeed
+ * 
+ * @param titleFadeOut
+ * @text Out
+ * @default 24
+ * @type number
+ * @min 1
+ * @parent titleFadeSpeed
+ * 
+ * @param splashSettings
+ * @text Splash Settings
+ * 
+ * @param splashFadeSpeed
+ * @text Fade Speed
+ * @default 24
+ * @type string
+ * @parent splashSettings
+ * 
+ * @param splashContents
+ * @text Contents
+ * @default []
+ * @type struct<SplashContent>[]
+ * @parent splashSettings
  * 
  * 
  * @command globalVariable
@@ -56,7 +148,95 @@
  * @type multiline_string
  */
 
+/*~struct~SplashContent:
+ * @param image
+ * @text Image
+ * @type file
+ * @dir /img
+ * 
+ * @param video
+ * @text Video
+ * @default
+ * @type string
+ * 
+ * @param audio
+ * @text Audio
+ * @type file
+ * @dir /audio
+ * @parent image
+ * 
+ * @param duration
+ * @text Duration
+ * @type number
+ * @min 1
+ * @parent image
+ *
+ */
+
+//==============================================================================
+function paramJsonParse(key, value) {
+    try {
+        return JSON.parse(value);
+    } catch(e) {
+        return value ? value : null;
+    }
+}
+
+//==============================================================================
+var $dataULDSLayer = null;
+var $dataFLashlight = null;
+
+var $testVar = [];
+
+class Liy {
+    static resolveAllDataMap() {
+        try{
+            const info = JSON.parse($dataMap.note);
+            //$dataULDSMap = info.ulds;
+        } catch(e) {
+        }
+    }
+}
+
+Array.prototype.remove = function(val) { 
+    let index = this.indexOf(val); 
+    if (index > -1) { 
+        this.splice(index, 1); 
+    } 
+};
+
+//==============================================================================
+class GlobalVariable {
+    static variables = [];
+
+    static init() {
+        this.variables = this.loadFromFile();
+    }
+
+    static resolveStatement(state) {
+        eval(state);
+    }
+    static saveToFile() {
+        const fileName = "GlobalVariables.json";
+        StorageManager.fsWriteFile("/data/" + fileName, this.variables);
+        return true;
+    }
+    static loadFromFile() {
+        const fileName = "GlobalVariables.json";
+        return StorageManager.fsReadFile("/data/" + fileName);
+    }
+    static allVariables() {
+        return this.variables;
+    }
+    static clearAll() {
+        this.variables = [];
+    }
+}
+
+
 (() =>{
+    "use strict"
+
     const pluginName = "Liy_Core";
     const params = PluginManager.parameters(pluginName);
 
@@ -70,11 +250,34 @@
         paramJsonParse));
     const titleVideoMuted = params["titleVideoMuted"] === "true" ? true : false;
     const titleVideoLoop = params["titleVideoLoop"] === "true" ? true : false;
+    const titleVideoPoster = params["titleVideoPoster"];
+    const titleFadeIn = Number(params["titleFadeIn"]) || 24;
+    const titleFadeOut = Number(params["titleFadeOut"]) || 24;
+
+    const splashFadeSpeed = Number(params["splashFadeSpeed"]) || 24;
+    const splashContents = JSON.parse(JSON.stringify(params["splashContents"], 
+        paramJsonParse))
+
+    let _titleCommands = {
+        "titleNewGame": params["titleNewGame"],
+        "titleContinue": params["titleContinue"],
+        "titleOptions": params["titleOptions"],
+        "titleExit": params["titleExit"]
+    }
+
+    const titleCommands = JSON.parse(JSON.stringify(_titleCommands, paramJsonParse));
+    const titleExitText = params["titleExitText"] || "Exit";
+
+    // GlobalVariable.init();
     
     //globalvar expression
     PluginManager.registerCommand(pluginName, "globalVariable", args => {
         GlobalVariable.resolveStatement(args.statement);
     });
+
+    Object.defineProperty(TextManager, "exit", {
+        value: titleExitText
+    })
 
     Scene_Map.prototype.onMapLoaded = function() {
         if (this._transfer) {
@@ -119,9 +322,6 @@
     Main.prototype.onEffekseerLoad = function(){
         this.eraseLoadingSpinner();
         if(isShowDevtools) SceneManager.showDevTools();
-        /*try{
-            GlobalVar.loadVar();
-        } catch(e) {}*/
         SceneManager.run(Scene_Boot);
     };
     
@@ -181,74 +381,146 @@
         this._videoSprite = new Sprite();
         if(titleVideo) {
             const texture = PIXI.Texture.from(titleVideo);
-            let src = texture.baseTexture.source;
+            let src = texture.baseTexture.resource.source;
             src.muted = titleVideoMuted;
             src.loop = titleVideoLoop;
+            if(titleVideoPoster) {
+                src.poster = titleVideoPoster;
+            }
             this._videoSprite.texture = texture;
         }
         this.addChild(this._videoSprite);
     }
-})();
 
-//==============================================================================
-function paramJsonParse(key, value) {
-    try {
-        return JSON.parse(value);
-    } catch(e) {
-        return value ? value : null;
-    }
-}
+    Window_TitleCommand.prototype.makeCommandList = function() {
+        const continueEnabled = this.isContinueEnabled();
+        if(titleCommands["titleNewGame"]) 
+            this.addCommand(TextManager.newGame, "newGame");
+        if(titleCommands["titleContinue"]) 
+            this.addCommand(TextManager.continue_, "continue", continueEnabled);
+        if(titleCommands["titleOptions"])
+            this.addCommand(TextManager.options, "options");
+        if(titleCommands["titleExit"])
+            this.addCommand(TextManager.exit, "exit");
+    };
 
-//==============================================================================
-var $dataULDSLayer = null;
-var $dataFLashlight = null;
+    Scene_Title.prototype.commandWindowRect = function() {
+        const offsetX = $dataSystem.titleCommandWindow.offsetX;
+        const offsetY = $dataSystem.titleCommandWindow.offsetY;
+        const ww = this.mainCommandWidth();
+        const wh = this.calcWindowHeight(4, true);
+        const wx = (Graphics.boxWidth - ww) / 2 + offsetX;
+        const wy = Graphics.boxHeight - wh - 96 + offsetY;
+        return new Rectangle(wx, wy, ww, wh);
+    };
 
-var $testVar = [];
+    Scene_Title.prototype.commandExit = function() {
+        SceneManager.exit();
+    };
 
-class Liy {
-    static resolveAllDataMap() {
-        try{
-            const info = JSON.parse($dataMap.note);
-            //$dataULDSMap = info.ulds;
-        } catch(e) {
+    Scene_Title.prototype.start = function() {
+        Scene_Base.prototype.start.call(this);
+        SceneManager.clearStack();
+        this.adjustBackground();
+        this.playTitleMusic();
+        this.startFadeIn(titleFadeIn, false);
+    };
+
+    Scene_Base.prototype.fadeOutAll = function() {
+        const time = this.slowFadeSpeed() / 60;
+        AudioManager.fadeOutBgm(time);
+        AudioManager.fadeOutBgs(time);
+        AudioManager.fadeOutMe(time);
+        this.startFadeOut(titleFadeOut);
+    };
+
+    Scene_Boot.prototype.startNormalGame = function() {
+        this.checkPlayerLocation();
+        DataManager.setupNewGame();
+        SceneManager.goto(Scene_Title);
+        // SceneManager.goto(Scene_Splash);
+        Window_TitleCommand.initCommandPosition();
+    };
+    
+
+    class Scene_Splash extends Scene_Base {
+        initialize() {
+            super.initialize();
+            this.loadSplashings();
+            this._startSplashing = false;
+            this._splashDuration = 0;
+        }
+
+        loadSplashings() {
+            this._splashings = [];
+            for(let i = splashContents.length - 1; i >= 0; i--) {
+                let content = splashContents[i];
+                let sprite = new Sprite();
+                if(content.image) {
+                    sprite.bitmap = ImageManager.loadBitmap("/img/", content.image);
+                } else if(content.video) {
+                    sprite.texture = PIXI.Texture.from(content.video);
+                }
+                this._splashings.push({
+                    sprite: sprite,
+                    audio: content.audio, 
+                    duration: content.duration
+                });
+            }
+        }
+
+        start() {
+            super.start();
+            this.startSplashing();
+            this.startFadeIn(this.fadeSpeed(), false);
+        }
+
+        stop() {
+            super.stop();
+            this.fadeOutAll();
+        }
+
+        update() {
+            super.update();
+            this.updateContents();
+        }
+
+        updateContents() {
+            if(this.isReady()) {
+                if(this._splashings) {
+                    if(this._splashDuration <= 0) {
+                        let splashing = this._splashings.pop();
+                        this._splashDuration += splashing.duration;
+                    }
+                } else {
+                    this.terminateSplash();
+                }
+            }
+        }
+
+        startSplashing() {
+            this._startSplashing = true;
+        }
+
+        terminateSplash() {
+            
+        }
+
+        isReady() {
+            return (
+                ImageManager.isReady() &&
+                EffectManager.isReady() &&
+                FontManager.isReady() &&
+                this._startSplashing
+            );
+        }
+
+        terminate() {
+            AudioManager.stopAll();
+        }
+
+        fadeSpeed() {
+            return splashFadeSpeed;
         }
     }
-}
-
-Array.prototype.remove = function(val) { 
-    let index = this.indexOf(val); 
-    if (index > -1) { 
-        this.splice(index, 1); 
-    } 
-};
-
-//==============================================================================
-class GlobalVariable {
-    static variables = [];
-
-    static resolveStatement(state) {
-        eval(state);
-    }
-    static saveToFile() {
-        const realPath = this.directoryPath();
-        const fileName = "GlobalVariables.json";
-        StorageManager.fsWriteFile(realPath + fileName, this.variables);
-        return true;
-    }
-    static loadFromFile() {
-        const realPath = this.directoryPath();
-        const fileName = "GlobalVariables.json";
-        return StorageManager.fsReadFile(realPath + fileName);
-    }
-    static allVariables() {
-        return this.variables;
-    }
-    static clearAll() {
-
-    }
-    static directoryPath() {
-        const path = require("path");
-        const base = path.dirname(process.mainModule.filename);
-        return path.join(base, "data/");
-    }
-}
+})();
