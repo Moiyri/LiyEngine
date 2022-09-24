@@ -975,7 +975,6 @@ class Liy_Multilayer {
     static getLayerSprite(setting) {
         const _tilling = setting.tilling;
         const sprite = _tilling ? new TilingSprite() : new Sprite();
-        console.log(sprite)
         const _setting = JSON.parse(JSON.stringify(setting));
         const _script = _setting.script;
         const _mode = _setting.mode;
@@ -1044,23 +1043,13 @@ class Liy_Multilayer {
             return $gameMap.adjustY(0) * $gameMap.tileHeight() * rate + y;
         }
 
-        console.log(setting);
+        var characterMapX = function() {
 
-        // class Timer {
-        //     constructor(time) {
-        //         this.time = time;
-        //     }
+        }
 
-        //     update() {
-        //         if(this.time > 0) {
-        //             this.time --;
-        //         }
-        //     }
-
-        //     isOver() {
-        //         return this.time <= 0;
-        //     }
-        // }
+        var characterMapY = function() {
+            
+        }
 
         var parallelTimer;
         var parallel = function(callback, timeOut, interval, trigger = true){
@@ -1296,16 +1285,9 @@ function paramJsonParse(key, value) {
         if(layersData) {
             layersData.forEach((layer) => {
                 const layerSprite = Liy_Multilayer.getLayerSprite(layer);
-                // console.log(layerSprite);
-                // const layerSprite2 = new Sprite(ImageManager.loadBitmap("img/pictures/", layer.layerBitmap));
-                // console.log(layerSprite2);
                 this._tilemap.addChild(layerSprite);
-                // this.addChild(layerSprite);
-                // this._baseSprite.addChild(layerSprite2);
             });
         }
-        // console.trace();
-        // console.log($gameMap.mapId());
     };
 
     Object.defineProperty(Sprite.prototype, "_updateCallback", {
@@ -1371,11 +1353,5 @@ function paramJsonParse(key, value) {
             });
         }
     };
-    
-    // const _Scene_Map_prototype_onTransfer = Scene_Map.prototype.onTransfer;
-    // Scene_Map.prototype.onTransfer = function() {
-    //     _Scene_Map_prototype_onTransfer.call(this);
-    //     const newmapId = $gamePlayer.newmapId();
-    // };
     
 })();
