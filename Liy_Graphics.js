@@ -5,7 +5,7 @@
  * @url https://github.com/Moiyri/LiyEngine
  * 
  * @help Liy_Graphics.js
- * VERSION: 1.0.0
+ * VERSION: 1.0.1
  * 
  * This plugin is a module of LiyEngine, which manage graphics.
  * 
@@ -72,6 +72,10 @@
  * @value Normal
  * @default Normal
  * @help Ways to display sprite.
+ * 
+ * @param effect
+ * @text Effect
+ * @type select
  * 
  * @param _mlTag
  * @text Tag
@@ -972,9 +976,10 @@ class Liy_Multilayer {
         return mapId ? this.mapLayerData[mapId] || null : this.mapLayerData;
     }
 
+    // get sprite by object config
     static getLayerSprite(setting) {
         const _tilling = setting.tilling;
-        const sprite = _tilling ? new TilingSprite() : new Sprite();
+        const sprite = _tilling ? new Liy.Multilayer.TilingSprite() : new Liy.Multilayer.Sprite();
         const _setting = JSON.parse(JSON.stringify(setting));
         const _script = _setting.script;
         const _mode = _setting.mode;
@@ -1031,7 +1036,16 @@ class Liy_Multilayer {
         var switches = function(index){
             return $gameSwitches.value(index) || false;
         };
+
         var variables = function(index){
+            return $gameVariables.value(index) || 0;
+        };
+
+        var s = function(index){
+            return $gameSwitches.value(index) || false;
+        };
+
+        var v = function(index){
             return $gameVariables.value(index) || 0;
         };
 
@@ -1048,7 +1062,7 @@ class Liy_Multilayer {
         }
 
         var characterMapY = function() {
-            
+
         }
 
         var parallelTimer;
@@ -1065,10 +1079,10 @@ class Liy_Multilayer {
         eval(code);
 
         if(isFollow) {
-            this._updateCallback.push(() => {
+            this._updateCallback.push((() => {
                 this.x = rx(setting.x, setting.offsetRateX);
                 this.y = ry(setting.y, setting.offsetRateY);
-            })
+            }).bind(this));
         }
 
         if(onUpdate)
@@ -1082,30 +1096,125 @@ class Liy_Multilayer {
     }
 }
 
-function paramJsonParse(key, value) {
-    try {
-        return key === "script" ? value : JSON.parse(value);
-    } catch(e) {
-        return value ? value : null;
-    }
+Liy = Liy || null;
+
+if(!Liy) {
+    throw new Error("Cannot load liy core.");
 }
 
+Liy.Multilayer = Liy_Multilayer;
+
 (() => {
-    try {
-        new Liy();
-    } catch(e) {
-        throw Error("Couldn't load Liy main module of undefined.");
+    class Liy_Sprite extends Sprite{
+        initialize() {
+            super.initialize();
+            this._updateCallback = [];
+            this._destroyCallback = [];
+            this._initializeCallback = [];
+
+            if(this._initializeCallback.length > 0) {
+                this._initializeCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+        }
+
+        update() {
+            if(this._updateCallback.length > 0) {
+                this._updateCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            super.update();
+        }
+
+        move(x, y) {
+            if(this._moveCallback.length > 0) {
+                this._moveCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            this.x = x || this.x;
+            this.y = y || this.y;
+
+            return this._tween;
+        }
+
+        destroy(options) {
+            if(this._destroyCallback.length > 0) {
+                this._destroyCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            this._updateCallback = [];
+            this._destroyCallback = [];
+            this._initializeCallback = [];
+            super.destroy(options);
+        }
     }
+
+    class Liy_TilingSprite extends TilingSprite {
+        initialize() {
+            super.initialize();
+            this._updateCallback = [];
+            this._destroyCallback = [];
+            this._initializeCallback = [];
+
+            if(this._initializeCallback.length > 0) {
+                this._initializeCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+        }
+
+        update() {
+            if(this._updateCallback.length > 0) {
+                this._updateCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            super.update();
+        }
+
+        move(x, y) {
+            if(this._moveCallback.length > 0) {
+                this._moveCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            this.x = x || this.x;
+            this.y = y || this.y;
+
+            return this._tween;
+        }
+
+        destroy(options) {
+            if(this._destroyCallback.length > 0) {
+                this._destroyCallback.forEach((callBack) => {
+                    callBack();
+                });
+            }
+            this._updateCallback = [];
+            this._destroyCallback = [];
+            this._initializeCallback = [];
+            super.destroy(options);
+        }
+    }
+
+    Liy.Multilayer.Sprite = Liy_Sprite;
+    Liy.Multilayer.TilingSprite = Liy_TilingSprite;
+})();
+
+(() => {
+    "use strict";
 
     const pluginName = "Liy_Graphics";
 
     const params = PluginManager.parameters(pluginName);
-
-    try{
-        const mapLayers = JSON.parse(JSON.stringify(params["mapLayerSetting"],
-            paramJsonParse));
-        Liy_Multilayer.resolveMapLayerData(mapLayers);
-    } catch {}
+    
+    const mapLayers = JSON.parse(JSON.stringify(params["mapLayerSetting"],
+        Liy.Utils.paramJsonParse));
+    Liy.Multilayer.resolveMapLayerData(mapLayers);
 
     //==========================================================================
     //Button hovered effects
@@ -1176,7 +1285,6 @@ function paramJsonParse(key, value) {
 
     Window_Base.prototype.move = function(x, y, width, height) {
         this.initEasing();
-        
         this.x = x || 0;
         this.y = y || 0;
         if (this._width !== width || this._height !== height) {
@@ -1187,59 +1295,11 @@ function paramJsonParse(key, value) {
         return this._tween;
     };
 
-    const _TilingSprite_prototype_initialize = TilingSprite.prototype.initialize;
-    TilingSprite.prototype.initialize = function() {
-        _TilingSprite_prototype_initialize.call(this);
-        if(this._initializeCallback.length > 0) {
-            this._initializeCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    }
-
-    TilingSprite.prototype.update = function() {
-        for (const child of this.children) {
-            if (child.update) {
-                child.update();
-            }
-        }
-        if(this._updateCallback.length > 0) {
-            this._updateCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    };
-
-    const _TilingSprite_prototype_move = TilingSprite.prototype.move;
-    TilingSprite.prototype.move = function() {
-        _TilingSprite_prototype_move.call(this);
-        if(this._moveCallback.length > 0) {
-            this._moveCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    }
-
-    TilingSprite.prototype.destroy = function() {
-        const options = { children: true, texture: true };
-        if(this._destroyCallback.length > 0) {
-            this._destroyCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-        PIXI.TilingSprite.prototype.destroy.call(this, options);
-    };
-
     const _Sprite_prototype_initialize = Sprite.prototype.initialize;
     Sprite.prototype.initialize = function(bitmap) {
         _Sprite_prototype_initialize.call(this, bitmap);
         this.initEasing();
-        if(this._initializeCallback.length > 0) {
-            this._initializeCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    };
+    }
 
     Sprite.prototype.initEasing = function() {
         this._easingTargets = {
@@ -1262,11 +1322,6 @@ function paramJsonParse(key, value) {
     };
 
     Sprite.prototype.move = function(x, y) {
-        if(this._moveCallback.length > 0) {
-            this._moveCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
         this.x = x || this.x;
         this.y = y || this.y;
         return this._tween;
@@ -1279,79 +1334,14 @@ function paramJsonParse(key, value) {
     };
 
     Spriteset_Map.prototype.createOtherTilemap = function() {
-        const layers = Liy_Multilayer.loadMapLayerData();
+        const layers = Liy.Multilayer.loadMapLayerData();
         const mapId = $gameMap.mapId();
         const layersData = layers[mapId];
         if(layersData) {
             layersData.forEach((layer) => {
-                const layerSprite = Liy_Multilayer.getLayerSprite(layer);
+                const layerSprite = Liy.Multilayer.getLayerSprite(layer);
                 this._tilemap.addChild(layerSprite);
             });
         }
     };
-
-    Object.defineProperty(Sprite.prototype, "_updateCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(Sprite.prototype, "_destroyCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(Sprite.prototype, "_moveCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(Sprite.prototype, "_initializeCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(TilingSprite.prototype, "_updateCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(TilingSprite.prototype, "_destroyCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(TilingSprite.prototype, "_moveCallback", {
-        value: [],
-        configurable: true
-    });
-
-    Object.defineProperty(TilingSprite.prototype, "_initializeCallback", {
-        value: [],
-        configurable: true
-    });
-
-    const _Sprite_prototype_destory = Sprite.prototype.destroy;
-    Sprite.prototype.destroy = function() {
-        _Sprite_prototype_destory.call(this);
-        if(this._destroyCallback.length > 0) {
-            this._destroyCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    }
-
-    Sprite.prototype.update = function() {
-        this._tween.update();
-        for (const child of this.children) {
-            if (child.update) {
-                child.update();
-            }
-        }
-        if(this._updateCallback.length > 0) {
-            this._updateCallback.forEach((callBack) => {
-                callBack();
-            });
-        }
-    };
-    
 })();
